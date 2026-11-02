@@ -1,0 +1,435 @@
+.lp {
+  --ink: #1b2a41;
+  --muted: #5b6678;
+  --paper: #faf8f4;
+  --line: #e4dfd5;
+  --blue: #2456d6;
+  --blue-dark: #1b43ad;
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5;
+}
+
+.lp *,
+.lp *::before,
+.lp *::after {
+  box-sizing: border-box;
+}
+
+.lp a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.lp a:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* ---------- Top bar ---------- */
+.lp-nav {
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.lp-nav-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.lp-brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* ---------- Buttons ---------- */
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 1.5px solid transparent;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.lp-btn-small {
+  padding: 8px 18px;
+  background: var(--blue);
+  color: #fff !important;
+}
+
+.lp-btn-small:hover,
+.lp-btn-primary:hover {
+  background: var(--blue-dark);
+}
+
+.lp-btn-primary {
+  background: var(--blue);
+  color: #fff !important;
+}
+
+.lp-btn-ghost {
+  background: #fff;
+  border-color: var(--line);
+}
+
+.lp-btn-ghost:hover {
+  border-color: var(--ink);
+}
+
+/* ---------- Hero ---------- */
+.lp-hero {
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 56px 24px 40px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 48px;
+  align-items: center;
+}
+
+.lp-kicker {
+  margin: 0 0 12px;
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.lp-hero h1 {
+  margin: 0 0 16px;
+  font-size: clamp(2rem, 4.2vw, 3.1rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.lp-lead {
+  margin: 0 0 28px;
+  max-width: 46ch;
+  font-size: 1.125rem;
+  color: var(--muted);
+}
+
+.lp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.lp-hero-photo {
+  aspect-ratio: 2 / 1;
+  border-radius: 20px;
+  /* Put your building photo in the public folder and match the name here. */
+  background: #d9cdb8 center / cover no-repeat;
+  box-shadow: 0 10px 30px rgba(27, 42, 65, 0.18);
+}
+
+/* ---------- Features ---------- */
+.lp-features {
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+  border-top: 1px solid var(--line);
+}
+
+.lp-features h2 {
+  margin: 0 0 24px;
+  font-size: 1.35rem;
+}
+
+.lp-feature-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px;
+}
+
+.lp-feature {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.lp-feature-icon {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: 1.35rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.lp-feature h3 {
+  margin: 0 0 2px;
+  font-size: 1.05rem;
+}
+
+.lp-feature p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* ---------- Footer ---------- */
+.lp-footer {
+  margin-top: auto;
+  padding: 20px 24px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+
+.lp-footer p {
+  margin: 0;
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 960px) {
+  .lp-hero {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding-top: 36px;
+  }
+
+  .lp-hero-photo {
+    order: -1;
+    aspect-ratio: 16 / 9;
+  }
+
+  .lp-feature-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Phone ---------- */
+@media (max-width: 560px) {
+  .lp-actions .lp-btn {
+    width: 100%;
+  }
+
+  .lp-feature-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+html {
+  scroll-padding-top: 72px;
+}
+
+/* ---------- Animations ---------- */
+@keyframes lp-rise {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes lp-drop {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes lp-photo-in {
+  from { opacity: 0; transform: translateX(36px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.lp-nav-inner {
+  animation: lp-drop 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Hero text appears line by line */
+.lp-hero-text > * {
+  animation: lp-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.lp-hero-text > :nth-child(1) { animation-delay: 0.10s; }
+.lp-hero-text > :nth-child(2) { animation-delay: 0.22s; }
+.lp-hero-text > :nth-child(3) { animation-delay: 0.34s; }
+.lp-hero-text > :nth-child(4) { animation-delay: 0.46s; }
+
+.lp-hero-photo {
+  animation: lp-photo-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+.lp-hero-photo:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(27, 42, 65, 0.26);
+}
+
+/* Buttons feel alive */
+.lp-btn {
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.lp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(27, 42, 65, 0.16);
+}
+
+.lp-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Scroll reveal (set up in Home.jsx) */
+.lp-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--d, 0s);
+}
+
+.lp-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Feature icons and rule cards react on hover */
+.lp-feature-icon {
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.lp-feature:hover .lp-feature-icon {
+  transform: translateY(-3px) scale(1.08);
+  border-color: var(--blue);
+}
+
+.lp .rule-card {
+  transition: opacity 0.7s ease, transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.lp .rule-card.is-visible:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.14);
+}
+
+/* Respect people who turn off motion in their system settings */
+@media (prefers-reduced-motion: reduce) {
+  .lp *,
+  .lp *::before,
+  .lp *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .lp-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Kiosk QR scanner ---------- */
+.lp-scan {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 8px 24px 40px;
+  width: 100%;
+}
+
+.lp-scan-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(27, 42, 65, 0.08);
+}
+
+.lp-scan-card h2 {
+  margin: 4px 0 6px;
+}
+
+.lp-scan-card > p {
+  margin: 0 auto 16px;
+  color: var(--muted);
+  max-width: 520px;
+}
+
+.scan-panel {
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.scan-frame {
+  position: relative;
+  min-height: 260px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0f1a2b;
+}
+
+.scan-reader {
+  width: 100%;
+}
+
+.scan-reader video {
+  display: block;
+  width: 100% !important;
+  object-fit: cover;
+}
+
+.scan-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  color: #fff;
+  text-align: center;
+}
+
+.scan-overlay p {
+  margin: 0;
+}
+
+.scan-status {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #eef1f6;
+  color: var(--muted);
+  transition: background 0.2s;
+}
+
+.scan-status strong {
+  font-size: 1.15rem;
+}
+
+.scan-status.ok {
+  background: #dcf5e4;
+  color: #12633a;
+}
+
+.scan-status.bad {
+  background: #fde4e1;
+  color: #9a2a1f;
+}
