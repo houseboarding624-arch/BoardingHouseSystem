@@ -1,0 +1,401 @@
+    /* Password container */
+    .password-container {
+        position: relative;
+        width: 100%;
+    }
+
+    /* Password input */
+    .password-container input {
+        width: 100%;
+        padding-right: 50px;
+        box-sizing: border-box;
+    }
+
+    /* Show / Hide button */
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+
+        width: 35px;
+        height: 35px;
+
+        transform: translateY(-50%);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border: none;
+        background: transparent;
+
+        cursor: pointer;
+
+        font-size: 19px;
+
+        transition:
+            transform 0.25s ease,
+            opacity 0.25s ease;
+    }
+
+    /* Hover animation */
+    .password-toggle:hover {
+        transform: translateY(-50%) scale(1.15);
+    }
+
+    /* Click animation */
+    .password-toggle:active {
+        transform: translateY(-50%) scale(0.85);
+    }
+
+    /* Eye icon */
+    #eyeIcon {
+        display: inline-block;
+
+        transition:
+            transform 0.3s ease,
+            opacity 0.2s ease;
+    }
+
+    /* Eye animation */
+    #eyeIcon.animate {
+        transform: rotate(180deg) scale(0.4);
+        opacity: 0;
+    }
+
+
+/* Password requirements checklist (Register page) */
+.pw-rules {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 10px 14px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    font-size: 13px;
+    color: #6b7280;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.pw-rules li.ok {
+    color: #15803d;
+    font-weight: 600;
+}
+
+.pw-mismatch {
+    display: block;
+    margin-top: 4px;
+    color: #b91c1c;
+}
+
+/* Register: the password field + its checklist span two rows, so the
+   Username and Confirm Password fields fill the space beside it. */
+.two-column .pw-block {
+    grid-row: span 2;
+}
+
+@media (max-width: 760px) {
+    .two-column .pw-block {
+        grid-row: auto;
+    }
+}
+
+
+/* =====================================================================
+   Login + Create Account: animated photo background and designed card
+   ===================================================================== */
+
+/* ---- Keyframes ---- */
+@keyframes authZoom {
+    from { transform: scale(1); }
+    to   { transform: scale(1.07); }
+}
+
+@keyframes authCardIn {
+    from { opacity: 0; transform: translateY(28px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes authRise {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes authFade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes authPop {
+    from { opacity: 0; transform: scale(0.4) rotate(-12deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes authFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-5px); }
+}
+
+@keyframes authShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+@keyframes authTick {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+@keyframes authBar {
+    from { background-position: 0% 0; }
+    to   { background-position: 200% 0; }
+}
+
+/* ---- Background photo: slow, gentle zoom ---- */
+.auth-body.auth-photo::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+        linear-gradient(rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.55)),
+        url('../assets/boarding-house.jpg') center / cover no-repeat;
+    transform-origin: center;
+    animation: authZoom 22s ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+.auth-body.auth-photo > .auth-page {
+    position: relative;
+    z-index: 1;
+}
+
+.auth-body.auth-photo .back-home {
+    animation: authFade 0.6s ease 0.2s backwards;
+}
+
+/* ---- The card ---- */
+.auth-card {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.16), transparent 45%),
+        radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.16), transparent 45%),
+        linear-gradient(160deg, #ffffff 0%, #f1f7ff 100%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 28px 70px rgba(2, 6, 23, 0.45);
+    animation: authCardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* Colored accent strip along the top, slowly flowing */
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #2563eb, #06b6d4, #10b981, #2563eb);
+    background-size: 200% 100%;
+    animation: authBar 6s linear infinite;
+}
+
+/* Soft decorative ring in the corner */
+.auth-card::after {
+    content: '';
+    position: absolute;
+    top: -90px;
+    right: -90px;
+    width: 230px;
+    height: 230px;
+    border-radius: 50%;
+    border: 30px solid rgba(37, 99, 235, 0.07);
+    pointer-events: none;
+}
+
+.auth-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Icon in a round badge */
+.auth-card .auth-icon {
+    width: 78px;
+    height: 78px;
+    margin: 4px auto 8px;
+    display: grid;
+    place-items: center;
+    font-size: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #dbeafe, #cffafe);
+    box-shadow:
+        0 10px 24px rgba(37, 99, 235, 0.28),
+        inset 0 0 0 4px #ffffff;
+    animation:
+        authPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards,
+        authFloat 4s ease-in-out 1s infinite;
+}
+
+.auth-card h1 {
+    background: linear-gradient(90deg, #1e3a8a, #2563eb 60%, #0891b2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: authRise 0.5s ease 0.3s backwards;
+}
+
+.auth-card > .muted {
+    animation: authRise 0.5s ease 0.38s backwards;
+}
+
+/* ---- Form fields: staggered reveal ---- */
+.auth-card .form > * {
+    animation: authRise 0.5s ease backwards;
+}
+
+.auth-card .form > :nth-child(1)  { animation-delay: 0.40s; }
+.auth-card .form > :nth-child(2)  { animation-delay: 0.45s; }
+.auth-card .form > :nth-child(3)  { animation-delay: 0.50s; }
+.auth-card .form > :nth-child(4)  { animation-delay: 0.55s; }
+.auth-card .form > :nth-child(5)  { animation-delay: 0.60s; }
+.auth-card .form > :nth-child(6)  { animation-delay: 0.65s; }
+.auth-card .form > :nth-child(7)  { animation-delay: 0.70s; }
+.auth-card .form > :nth-child(8)  { animation-delay: 0.75s; }
+.auth-card .form > :nth-child(9)  { animation-delay: 0.80s; }
+.auth-card .form > :nth-child(n+10) { animation-delay: 0.85s; }
+
+.auth-card .auth-footer {
+    animation: authRise 0.5s ease 0.9s backwards;
+}
+
+/* ---- Inputs ---- */
+.auth-card .form label {
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.auth-card .form input,
+.auth-card .form select {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+/* Only text inputs lift on focus. A transform on a <select> makes Chrome draw
+   its dropdown list with an oversized white box, so selects never get one. */
+.auth-card .form input {
+    transition-property: border-color, box-shadow, background, transform;
+}
+
+.auth-card .form select,
+.auth-card .form select:focus {
+    transform: none;
+}
+
+.auth-card .form select option {
+    background: #ffffff;
+    color: #0f172a;
+}
+
+.auth-card .form input:hover,
+.auth-card .form select:hover {
+    border-color: #93c5fd;
+}
+
+.auth-card .form input:focus,
+.auth-card .form select:focus {
+    background: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+.auth-card .form input:focus {
+    transform: translateY(-1px);
+}
+
+/* ---- Main button ---- */
+.auth-card .btn-primary {
+    width: 100%;
+    margin-top: 10px;
+    padding: 13px 18px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 55%, #0891b2 100%);
+    background-size: 170% 100%;
+    background-position: 0 0;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.35);
+    transition:
+        background-position 0.4s ease,
+        box-shadow 0.25s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.auth-card .btn-primary:hover:not(:disabled) {
+    background-position: 100% 0;
+    box-shadow: 0 16px 30px rgba(37, 99, 235, 0.45);
+    transform: translateY(-2px);
+}
+
+.auth-card .btn-primary:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+}
+
+/* ---- Messages ---- */
+.auth-card .notice {
+    animation: authRise 0.35s ease backwards;
+}
+
+.auth-card .notice-error {
+    animation:
+        authRise 0.35s ease backwards,
+        authShake 0.45s ease 0.1s;
+}
+
+/* ---- Password checklist (Register) ---- */
+.auth-card .pw-rules {
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.auth-card .pw-rules li {
+    transition: color 0.25s ease;
+}
+
+.auth-card .pw-rules li.ok {
+    animation: authTick 0.3s ease;
+}
+
+.auth-card .pw-mismatch {
+    animation: authRise 0.25s ease;
+}
+
+.auth-footer a {
+    transition: color 0.2s ease;
+}
+
+.auth-footer a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+/* Respect "reduce motion" */
+@media (prefers-reduced-motion: reduce) {
+    .auth-body.auth-photo::before,
+    .auth-card,
+    .auth-card::before,
+    .auth-card .auth-icon,
+    .auth-card h1,
+    .auth-card > .muted,
+    .auth-card .form > *,
+    .auth-card .auth-footer,
+    .auth-card .notice,
+    .auth-card .pw-rules li.ok {
+        animation: none;
+    }
+}

@@ -27,9 +27,22 @@ app.use('/api/gcash-qr', express.json({ limit: '700kb' }));
 app.use(express.json({ limit: '100kb' }));
 app.use(cookieParser());
 
-if (!config.isProd) {
-  // In development the Vite dev server proxies /api, but allow direct calls too.
+if (!config.isProd || config.crossSite) {
+  // Development: the Vite dev server proxies /api, but allow direct calls too.
+  // Cross-site: the React app lives on another origin (GitHub Pages) and must be allowed explicitly.
   app.use(cors({ origin: config.clientOrigin, credentials: true }));
+}
+
+if (config.crossSite) {
+  // The login cookie is SameSite=None here, so refuse state-changing requests from any other website (CSRF).
+  app.use((req, res, next) => {
+    if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+    const origin = req.get('origin');
+    if (origin && origin !== config.clientOrigin) {
+      return res.status(403).json({ success: false, message: 'Request blocked.' });
+    }
+    return next();
+  });
 }
 
 app.use('/api/auth', authRoutes);
@@ -46,7 +59,7 @@ app.use('/api', (req, res) => res.status(404).json({ success: false, message: 'N
 
 // Serve the built React app (npm run build) from the same server in production.
 const here = path.dirname(fileURLToPath(import.meta.url));
-const dist = path.resolve(here, '../../frontend/dist');
+const dist = path.resolve(here, '../../dist');
 
 if (fs.existsSync(dist)) {
   app.use(express.static(dist));

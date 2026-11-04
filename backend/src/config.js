@@ -4,6 +4,8 @@ export const config = {
   port: Number(process.env.PORT) || 4000,
   isProd: process.env.NODE_ENV === 'production',
   clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+  // true when the React app is hosted on another site (GitHub Pages) than this API.
+  crossSite: process.env.CROSS_SITE === 'true',
   supabaseUrl: process.env.SUPABASE_URL || '',
   supabaseKey: process.env.SUPABASE_SECRET_KEY || '',
   jwtSecret: process.env.JWT_SECRET || '',

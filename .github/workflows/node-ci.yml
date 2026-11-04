@@ -20,11 +20,11 @@ jobs:
 
       - name: Install dependencies
         run: |
+          npm install
           npm install --prefix backend
-          npm install --prefix frontend
 
       - name: Check backend syntax
         run: find backend/src backend/scripts -name "*.js" -print0 | xargs -0 -n1 node --check
 
       - name: Build frontend
-        run: npm run build --prefix frontend
+        run: npm run build

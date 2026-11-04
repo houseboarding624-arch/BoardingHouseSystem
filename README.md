@@ -4,9 +4,11 @@ React (Vite) frontend + Node.js/Express backend + Supabase (PostgreSQL).
 This replaces the old PHP version; there are no `.php` files left.
 
 ```
-backend/    Express API (auth, dashboards, payments, rooms, QR attendance)
-frontend/   React app (Vite, React Router)
-supabase/   Database migration (same schema as before)
+.github/workflows/   CI, GitHub Pages deploy, database migration deploy
+backend/             Express API (auth, dashboards, payments, rooms, QR attendance)
+src/                 React app (Vite, React Router)
+supabase/            Database migrations
+index.html, vite.config.js, package.json   the React app at the repo root
 ```
 
 ## 1. Database
@@ -38,10 +40,10 @@ not your normal Gmail password. Without them, notices still show in each boarder
 Requires Node.js 18+.
 
 ```bash
-npm install                       # root (installs "concurrently")
-npm run install:all               # backend + frontend dependencies
+npm run install:all               # frontend (root) + backend dependencies
 npm run seed                      # optional: creates demo accounts
-npm run dev                       # API on :4000, web app on http://localhost:5173
+npm run dev:api                   # terminal 1: API on http://localhost:4000
+npm run dev                       # terminal 2: web app on http://localhost:5173
 ```
 
 Demo accounts created by `npm run seed` (change these before going live):
@@ -57,12 +59,28 @@ Existing users from the PHP app keep working: their bcrypt password hashes are c
 ## 4. Production
 
 ```bash
-npm run build     # builds frontend/dist
+npm run build     # builds dist/
 NODE_ENV=production npm start
 ```
 
-When `frontend/dist` exists the Express server serves it, so one process hosts the whole app.
+When `dist/` exists the Express server serves it, so one process hosts the whole app (simplest option).
 Serve it over HTTPS (login cookie is `secure` in production, and the camera QR scanner needs HTTPS).
+
+## 5. Live site on GitHub Pages
+
+GitHub Pages only hosts static files, so the **React app** goes on Pages and the **Express API** must run on a
+Node host (Render, Railway, ...) over https.
+
+1. Host the API (`backend/`) and set its environment values (see `backend/.env.example`), including
+   `CLIENT_ORIGIN=https://<your-github-username>.github.io` and `CROSS_SITE=true`, plus `NODE_ENV=production`.
+2. In the GitHub repo: **Settings > Secrets and variables > Actions > Variables**, add
+   `VITE_API_URL` = the https URL of the hosted API (no trailing slash).
+3. **Settings > Pages > Build and deployment > Source = GitHub Actions** (not "Deploy from a branch").
+4. Push to `main`. The *Deploy to GitHub Pages* workflow builds the app and publishes it at
+   `https://<your-github-username>.github.io/<repo-name>/`.
+
+Known limit: the login cookie is sent between two different sites, so browsers that block third-party cookies
+(for example Safari) cannot stay logged in. For those, host the whole app on the Node host instead (section 4).
 
 ## API overview
 
@@ -92,6 +110,7 @@ Serve it over HTTPS (login cookie is `secure` in production, and the camera QR s
 ## GitHub Actions
 
 - `node-ci.yml` syntax-checks the backend and builds the frontend (replaces the old PHP lint job).
+- `deploy-pages.yml` builds the React app and publishes it to GitHub Pages (see section 5).
 - `supabase-deploy.yml` pushes `supabase/migrations` (unchanged). It needs the repository secrets
   `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_ID`. If the database already exists, baseline the
   migration history with the Supabase CLI before enabling it.

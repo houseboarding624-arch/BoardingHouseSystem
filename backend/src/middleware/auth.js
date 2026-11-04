@@ -8,8 +8,9 @@ const MAX_AGE_MS = 8 * 60 * 60 * 1000; // 8 hours
 export function cookieOptions() {
   return {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: config.isProd,
+    // Cross-site (app on GitHub Pages, API elsewhere) needs SameSite=None, which requires Secure (https).
+    sameSite: config.crossSite ? 'none' : 'lax',
+    secure: config.isProd || config.crossSite,
     path: '/',
   };
 }

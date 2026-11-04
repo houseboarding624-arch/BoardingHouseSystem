@@ -19,7 +19,7 @@ const router = Router();
 
 const ROLES = ['Admin', 'Owner', 'Boarder'];
 
-// Keep in sync with frontend/src/passwordRules.js
+// Keep in sync with src/passwordRules.js
 const PASSWORD_RULES = [
   [(p) => p.length >= 8, 'at least 8 characters'],
   [(p) => /[A-Z]/.test(p), 'an uppercase letter'],

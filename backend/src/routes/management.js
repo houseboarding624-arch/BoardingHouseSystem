@@ -44,7 +44,7 @@ router.get(
     const payments = unwrap(
       await supabase
         .from('payments')
-        .select('id,user_id,amount,payment_date,description')
+        .select('id,user_id,amount,payment_date,description,type,verified')
         .order('payment_date', { ascending: false })
         .order('id', { ascending: false })
         .limit(50)
