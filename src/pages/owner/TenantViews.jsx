@@ -290,7 +290,9 @@ export function UsersView({ data }) {
               <Badge tone={tone[u.role]}>{u.role}</Badge>
             </td>
             <td>{u.email || '-'}</td>
-            <td>{u.status === 'Disabled' ? <Badge tone="red">Disabled</Badge> : <Badge tone="green">Active</Badge>}</td>
+            <td>
+              <Badge tone={{ Disabled: 'red', Pending: 'orange', Declined: 'red' }[u.status] || 'green'}>{u.status || 'Active'}</Badge>
+            </td>
           </tr>
         ))}
       </Table>

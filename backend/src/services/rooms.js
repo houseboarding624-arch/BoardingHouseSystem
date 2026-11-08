@@ -4,7 +4,7 @@ import { supabase, unwrap } from '../supabase.js';
 export function tenantsByRoom(boarders) {
   const map = new Map();
   for (const b of boarders) {
-    if (b.status === 'Disabled' || !b.preferred_room) continue;
+    if ((b.status && b.status !== 'Active') || !b.preferred_room) continue;
     const key = String(b.preferred_room);
     if (!map.has(key)) map.set(key, []);
     map.get(key).push(b);

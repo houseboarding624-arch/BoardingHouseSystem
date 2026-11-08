@@ -4,6 +4,11 @@ import { api } from '../api.js';
 import Notice from '../components/Notice.jsx';
 import { PASSWORD_RULES, isStrongPassword } from '../passwordRules.js';
 
+// The boarding house has Room 1 to Room 12 only.
+const MAX_ROOM = 12;
+const ROOM_ERROR = `Room does not exist. Rooms are only up to Room ${MAX_ROOM}.`;
+const roomIsValid = (value) => value === '' || (/^\d{1,2}$/.test(value) && Number(value) >= 1 && Number(value) <= MAX_ROOM);
+
 const EMPTY = {
   username: '',
   password: '',
@@ -37,10 +42,15 @@ export default function Register() {
       setError('Passwords do not match.');
       return;
     }
+    if (!roomIsValid(form.preferred_room.trim())) {
+      setError(ROOM_ERROR);
+      return;
+    }
 
     setBusy(true);
     try {
       const { confirm_password: _ignored, ...payload } = form;
+      payload.preferred_room = payload.preferred_room.trim() ? String(Number(payload.preferred_room)) : '';
       const data = await api.post('/auth/register', payload);
       navigate(`/login?message=${encodeURIComponent(data.message)}`);
     } catch (err) {
@@ -127,7 +137,13 @@ export default function Register() {
             </div>
             <div>
               <label>Contact</label>
-              <input value={form.contact} onChange={update('contact')} maxLength={30} />
+              <input
+                value={form.contact}
+                onChange={(e) => setForm({ ...form, contact: e.target.value.replace(/\D/g, '').slice(0, 11) })}
+                inputMode="numeric"
+                maxLength={11}
+                placeholder="09123456789"
+              />
             </div>
             <div>
               <label>Email</label>
@@ -135,7 +151,16 @@ export default function Register() {
             </div>
             <div>
               <label>Preferred Room</label>
-              <input value={form.preferred_room} onChange={update('preferred_room')} maxLength={20} placeholder="101" />
+              <input
+                value={form.preferred_room}
+                onChange={(e) => setForm({ ...form, preferred_room: e.target.value.replace(/\D/g, '').slice(0, 3) })}
+                inputMode="numeric"
+                placeholder={`1 to ${MAX_ROOM}`}
+                aria-invalid={!roomIsValid(form.preferred_room.trim())}
+              />
+              {!roomIsValid(form.preferred_room.trim()) && (
+                <small style={{ color: '#b91c1c', fontWeight: 700 }}>{ROOM_ERROR}</small>
+              )}
             </div>
             <div>
               <label>Address</label>

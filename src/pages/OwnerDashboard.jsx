@@ -15,6 +15,7 @@ import {
   ReportsView,
 } from './owner/MoneyViews.jsx';
 import { BoarderReportsView, GcashView } from './owner/BoarderRequests.jsx';
+import { RegistrationsView } from './owner/Registrations.jsx';
 import RoomPie from '../components/RoomPie.jsx';
 import GenderPie from '../components/GenderPie.jsx';
 import {
@@ -39,6 +40,7 @@ const NAV = [
   {
     group: 'Tenants',
     items: [
+      ['✔', 'Registrations', 'registrations'],
       ['♟', 'Tenants', 'tenants'],
       ['▣', 'Contracts', 'contracts'],
       ['▧', 'Reservations', 'reservations'],
@@ -78,6 +80,7 @@ const OTHER_NAV = [
 const VIEWS = {
   rooms: RoomsView,
   vacancy: VacancyView,
+  registrations: RegistrationsView,
   tenants: TenantsView,
   contracts: ContractsView,
   reservations: ReservationsView,
@@ -160,17 +163,24 @@ export default function OwnerDashboard() {
   }, [current]);
 
   // Red counters in the sidebar + a banner when something new arrives between refreshes.
-  const badges = { reports_inbox: data?.stats.newReports ?? 0, gcash: data?.stats.pendingGcash ?? 0 };
+  const badges = {
+    reports_inbox: data?.stats.newReports ?? 0,
+    gcash: data?.stats.pendingGcash ?? 0,
+    registrations: data?.stats.pendingRegistrations ?? 0,
+  };
   const seen = useRef(null);
   useEffect(() => {
     if (!data) return;
-    const now = { reports: data.stats.newReports, gcash: data.stats.pendingGcash };
+    const now = { reports: data.stats.newReports, gcash: data.stats.pendingGcash, registrations: data.stats.pendingRegistrations };
     const before = seen.current;
     seen.current = now;
     if (!before) return;
     if (now.reports > before.reports) {
       const latest = data.reports.find((r) => r.status === 'New');
       setFlash(`🔔 New report from ${latest?.full_name ?? 'a boarder'}: ${latest?.subject ?? ''}`);
+    } else if (now.registrations > before.registrations) {
+      const latest = data.registrations.filter((r) => r.status === 'Pending').at(-1);
+      setFlash(`🔔 New registration from ${latest?.full_name ?? 'a boarder'} waiting for approval`);
     } else if (now.gcash > before.gcash) {
       const latest = data.gcashPayments.find((g) => g.status === 'Pending');
       setFlash(`🔔 New GCash payment from ${latest?.full_name ?? 'a boarder'} (${peso(latest?.amount)}) waiting for approval`);

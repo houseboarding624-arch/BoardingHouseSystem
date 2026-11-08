@@ -296,7 +296,7 @@ function GcashQrCard({ data, run }) {
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState('');
   const has = data.settings.gcash_has_qr;
-  const { url: qrPreview } = useBlobUrl(has ? `/gcash-qr?v=${data.settings.gcash_qr_version}` : null);
+  const { url: qrPreview, failed: qrFailed } = useBlobUrl(has ? `/gcash-qr?v=${data.settings.gcash_qr_version}` : null);
 
   async function onPick(e) {
     const file = e.target.files?.[0];
@@ -322,6 +322,11 @@ function GcashQrCard({ data, run }) {
         In the GCash app open <b>QR Code / Receive Money</b>, take a screenshot, and upload it here. Boarders will see
         this QR on their dashboard and pay by scanning it.
       </p>
+      {has && !qrPreview && (
+        <p className="ov-hint">
+          {qrFailed ? 'The saved QR could not be loaded. Reload the page, or upload it again.' : 'Loading QR…'}
+        </p>
+      )}
       {has && qrPreview && (
         <img
           src={qrPreview}

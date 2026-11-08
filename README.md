@@ -87,7 +87,7 @@ Known limit: the login cookie is sent between two different sites, so browsers t
 | Method | Path                      | Access          |
 |--------|---------------------------|-----------------|
 | POST   | `/api/auth/login`         | public          |
-| POST   | `/api/auth/register`      | public (Boarder accounts only) |
+| POST   | `/api/auth/register`      | public (Boarder accounts only, created as *Pending* until the admin approves) |
 | POST   | `/api/auth/logout`        | any             |
 | GET    | `/api/auth/me`            | logged in       |
 | GET    | `/api/boarder/dashboard`  | Boarder         |
@@ -156,6 +156,7 @@ Run the migration `supabase/migrations/20261018000000_advance_gender_reset.sql` 
   (valid 15 minutes, 5 tries, stored hashed), then sets a new password. Needs the Gmail/SMTP settings; in
   development the code is printed in the backend console. No email on the account? Admin > Tenants > *Reset
   password* creates a temporary password, and the boarder changes it in *Change Password* on their dashboard.
+- **Registration approval:** new boarders are *Pending* and cannot log in until the admin clicks **Approve** in *Registrations* (or **Decline**). Run the migration `20261110000000_registration_approval.sql` first.
 - **Gender:** Male / Female is chosen on the Register page and shown in Tenants and the Owner's Boarders table.
 - **Rent once a month:** a boarder can't pay Rent again in the same calendar month (admin form and GCash form
   both check it). They can pay again next month. **Advance Payment** (formerly *Deposit*) is for paying ahead.

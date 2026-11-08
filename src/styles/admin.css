@@ -396,3 +396,16 @@
 .room-chip.occupied { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
 .room-chip.maintenance { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
 .room-chip.mine { box-shadow: 0 0 0 2px #2563eb; }
+
+/* Logout confirmation modal */
+.logout-overlay { position: fixed; inset: 0; z-index: 1100; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15, 23, 42, .55); }
+.logout-modal { width: min(380px, 100%); padding: 28px 24px 22px; border-radius: 14px; background: #fff; color: #0f172a; text-align: center; box-shadow: 0 20px 50px rgba(15, 23, 42, .3); }
+.logout-icon { width: 52px; height: 52px; margin: 0 auto 12px; border-radius: 50%; display: grid; place-items: center; font-size: 26px; background: #fee2e2; color: #b91c1c; }
+.logout-modal h2 { margin: 0 0 6px; font-size: 22px; color: #0f172a; }
+.logout-modal p { margin: 0 0 20px; font-size: 16px; color: #475569; }
+.logout-actions { display: flex; gap: 10px; }
+.logout-actions button { flex: 1; padding: 11px 14px; border-radius: 9px; border: 1px solid transparent; font-family: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+.logout-actions button:disabled { opacity: .6; cursor: wait; }
+.logout-cancel { background: #f1f5f9; border-color: #cbd5e1 !important; color: #0f172a; }
+.logout-confirm { background: #dc2626; color: #fff; }
+.logout-confirm:hover:not(:disabled) { background: #b91c1c; }

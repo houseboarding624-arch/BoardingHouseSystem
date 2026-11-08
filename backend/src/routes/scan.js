@@ -34,6 +34,9 @@ router.post(
     if (!person || person.role !== 'Boarder') {
       return fail(res, 400, 'Invalid QR code. Please use your boarder QR.');
     }
+    if (person.status === 'Pending' || person.status === 'Declined') {
+      return fail(res, 403, 'Your account is not approved yet.');
+    }
     if (person.status === 'Disabled') {
       return fail(res, 403, 'Your account is disabled. Please contact the owner.');
     }

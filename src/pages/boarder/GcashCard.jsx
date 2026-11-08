@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api.js';
 import { dateTime, peso } from '../../utils.js';
+import { useBlobUrl } from '../../useBlobUrl.js';
 
 const TONE = { Pending: 'bd-pill warn', Approved: 'bd-pill ok', Rejected: 'bd-pill bad' };
 const BLANK = { amount: '', type: 'Rent', reference_no: '', sender_number: '', note: '' };
@@ -12,13 +13,13 @@ export default function GcashCard({ gcash, history, roomRate, rentPaid, onDone }
   const [copied, setCopied] = useState(false);
   const set = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
-
+  // Rent can only be paid once a month: switch to Advance Payment when this month is already covered.
   useEffect(() => {
     if (rentPaid) setForm((f) => (f.type === 'Rent' ? { ...f, type: 'Advance Payment' } : f));
   }, [rentPaid]);
 
   const ready = Boolean(gcash?.number || gcash?.hasQr);
-  const qrUrl = `/api/gcash-qr?v=${gcash?.qrVersion ?? ''}`;
+  const { url: qrSrc, failed: qrFailed } = useBlobUrl(gcash?.hasQr ? `/gcash-qr?v=${gcash.qrVersion ?? ''}` : null);
 
   async function submit(e) {
     e.preventDefault();
@@ -60,10 +61,18 @@ export default function GcashCard({ gcash, history, roomRate, rentPaid, onDone }
             {gcash.hasQr ? (
               <>
                 <span className="admin-muted">Scan this QR in GCash</span>
-                <img className="gcash-qr" src={qrUrl} alt="GCash QR code for payment" />
-                <a className="admin-btn admin-btn-light" href={qrUrl} download="gcash-qr">
-                  Save QR image
-                </a>
+                {qrSrc ? (
+                  <>
+                    <img className="gcash-qr" src={qrSrc} alt="GCash QR code for payment" />
+                    <a className="admin-btn admin-btn-light" href={qrSrc} download="gcash-qr">
+                      Save QR image
+                    </a>
+                  </>
+                ) : (
+                  <span className="admin-muted">
+                    {qrFailed ? 'The QR code could not be loaded. Reload the page or use the number below.' : 'Loading QR code…'}
+                  </span>
+                )}
               </>
             ) : (
               <span className="admin-muted">Send your payment to</span>

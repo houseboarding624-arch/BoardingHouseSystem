@@ -49,7 +49,17 @@ router.get(
         .from('users')
         .select(BOARDER_COLUMNS)
         .eq('role', 'Boarder')
+        .in('status', ['Active', 'Disabled'])
         .order('created_at', { ascending: false })
+    );
+    // Registrations waiting for approval (and ones that were declined).
+    const registrations = unwrap(
+      await supabase
+        .from('users')
+        .select(BOARDER_COLUMNS)
+        .eq('role', 'Boarder')
+        .in('status', ['Pending', 'Declined'])
+        .order('created_at', { ascending: true })
     );
     const allUsers = unwrap(
       await supabase
@@ -170,6 +180,7 @@ router.get(
           .reduce((sum, e) => sum + Number(e.amount), 0),
         newReports: reports.filter((r) => r.status === 'New').length,
         pendingGcash: gcashPayments.filter((g) => g.status === 'Pending').length,
+        pendingRegistrations: registrations.filter((r) => r.status === 'Pending').length,
         todayAttendance: todayRecords.length,
         todayTimeOut: todayRecords.filter((r) => r.time_out).length,
       },
@@ -180,6 +191,7 @@ router.get(
       },
       rooms: roomRows,
       boarders: boarderRows,
+      registrations,
       users: allUsers,
       payments: payments.map((p) => ({ ...p, full_name: nameOf(p.user_id) })),
       expenses,
@@ -203,6 +215,80 @@ router.get(
       })),
       runtime: `Node ${process.version}`,
     });
+  })
+);
+
+// ----------------------------------------------------------- registrations
+// New boarders register as "Pending" and cannot log in until the admin approves them.
+async function findRegistration(id) {
+  const rows = unwrap(
+    await supabase
+      .from('users')
+      .select('id,full_name,email,preferred_room,status')
+      .eq('id', id)
+      .eq('role', 'Boarder')
+      .in('status', ['Pending', 'Declined'])
+      .limit(1)
+  );
+  return rows[0];
+}
+
+router.post(
+  '/registrations/:id/approve',
+  asyncHandler(async (req, res) => {
+    const person = await findRegistration(idOf(req));
+    if (!person) return fail(res, 404, 'Registration not found.');
+
+    // If the chosen room exists, the boarder moves in today; otherwise the admin assigns a room later.
+    let assigned = false;
+    if (person.preferred_room) {
+      const exists = unwrap(
+        await supabase.from('rooms').select('id').eq('room_number', person.preferred_room).limit(1)
+      );
+      if (exists.length) {
+        const check = await checkRoomHasBed(person.preferred_room);
+        if (!check.ok) return fail(res, 409, `${check.message} Decline this account, or change the room first.`);
+        assigned = true;
+      }
+    }
+
+    const today = todayString();
+    unwrap(
+      await supabase
+        .from('users')
+        .update({
+          status: 'Active',
+          move_in_date: assigned ? today : null,
+          next_due_date: assigned ? addMonths(today, 1) : null,
+        })
+        .eq('id', person.id)
+    );
+    if (assigned) await syncRoomStatuses();
+
+    await notifyUser(person, {
+      type: 'Account',
+      title: 'Your account was approved',
+      message: 'Your boarding house account was approved by the admin. You can now log in.',
+    });
+    await audit(req.user, 'Registration approved', person.full_name);
+    res.json({ success: true, message: `${person.full_name} was approved and can now log in.` });
+  })
+);
+
+router.post(
+  '/registrations/:id/decline',
+  asyncHandler(async (req, res) => {
+    const person = await findRegistration(idOf(req));
+    if (!person) return fail(res, 404, 'Registration not found.');
+
+    unwrap(await supabase.from('users').update({ status: 'Declined' }).eq('id', person.id));
+    await notifyUser(person, {
+      type: 'Account',
+      title: 'Your registration was declined',
+      message: 'Your boarding house registration was declined by the admin. Please contact the owner for details.',
+    });
+    await audit(req.user, 'Registration declined', person.full_name);
+    res.json({ success: true, message: `${person.full_name}'s registration was declined.` });
   })
 );
 

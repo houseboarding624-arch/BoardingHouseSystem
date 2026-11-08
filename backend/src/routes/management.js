@@ -28,6 +28,7 @@ router.get(
         .from('users')
         .select('id,username,full_name,contact,email,preferred_room,gender,status,next_due_date')
         .eq('role', 'Boarder')
+        .in('status', ['Active', 'Disabled'])
         .order('full_name', { ascending: true })
     );
     const rooms = await syncRoomStatuses();
@@ -116,6 +117,7 @@ router.get(
         .from('users')
         .select('id,full_name')
         .eq('role', 'Boarder')
+        .in('status', ['Active', 'Disabled'])
         .order('full_name', { ascending: true })
     );
     res.json({ success: true, boarders });

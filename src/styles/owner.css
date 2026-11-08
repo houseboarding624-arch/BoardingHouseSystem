@@ -721,7 +721,7 @@ button.owner-logout {
 }
 .ov-btn.small { padding: 5px 9px; font-size: 14px; }
 .ov-btn.ghost { background: transparent; color: #334155; border: 1px solid #cbd5e1; }
-.ov-btn.danger { background: #dc2626; color: #2b0a0d; }
+.ov-btn.danger { background: #dc2626; color: #ffffff; }
 .ov-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .ov-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .ov-hint { margin: 10px 0 0; color: #64748b; font-size: 14px; line-height: 1.5; }

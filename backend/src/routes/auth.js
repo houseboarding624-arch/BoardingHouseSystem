@@ -9,12 +9,11 @@ import {
   clearSessionCookie,
 } from '../middleware/auth.js';
 import { rateLimit } from '../middleware/rateLimit.js';
-import { todayString } from '../utils/time.js';
-import { addMonths } from '../utils/dates.js';
-import { checkRoomHasBed, syncRoomStatuses } from '../services/rooms.js';
+import { checkRoomHasBed } from '../services/rooms.js';
 import { sendMail } from '../mailer.js';
 import { config } from '../config.js';
 
+const MAX_ROOM = 12;
 const router = Router();
 
 const ROLES = ['Admin', 'Owner', 'Boarder'];
@@ -104,6 +103,12 @@ router.post(
       return fail(res, 401, 'Username, password, or account type is incorrect.');
     }
 
+    if (user.role === 'Boarder' && user.status === 'Pending') {
+      return fail(res, 403, 'Your account is waiting for the admin to approve it. Please try again later.');
+    }
+    if (user.role === 'Boarder' && user.status === 'Declined') {
+      return fail(res, 403, 'Your registration was declined. Please contact the owner.');
+    }
     if (user.role === 'Boarder' && user.status === 'Disabled') {
       return fail(res, 403, 'Your account has been disabled. Please contact the owner.');
     }
@@ -123,11 +128,22 @@ router.post(
     const contact = String(body.contact ?? '').trim();
     const email = String(body.email ?? '').trim();
     const address = String(body.address ?? '').trim();
-    const preferredRoom = String(body.preferred_room ?? '').trim();
+    let preferredRoom = String(body.preferred_room ?? '').trim();
     const gender = String(body.gender ?? '').trim();
 
     if (!GENDERS.includes(gender)) {
       return fail(res, 400, 'Please select your gender (Male or Female).');
+    }
+    if (contact && !/^\d{1,11}$/.test(contact)) {
+      return fail(res, 400, 'Contact number must be numbers only, up to 11 digits.');
+    }
+    // The boarding house only has Room 1 to Room MAX_ROOM.
+    if (preferredRoom) {
+      const n = /^\d{1,3}$/.test(preferredRoom) ? Number(preferredRoom) : NaN;
+      if (!(n >= 1 && n <= MAX_ROOM)) {
+        return fail(res, 400, `Room does not exist. Rooms are only up to Room ${MAX_ROOM}.`);
+      }
+      preferredRoom = String(n); // "05" -> "5", matches the room number in the database
     }
     if (!username || !password || !fullName) {
       return fail(res, 400, 'Username, password, and full name are required.');
@@ -155,8 +171,8 @@ router.post(
       if (sameEmail.length) return fail(res, 409, 'Email is already registered.');
     }
 
-    // If the chosen room exists it must be open and have a free bed.
-    let assigned = false;
+    // If the chosen room exists it must accept boarders (not under maintenance).
+    // The room is only really assigned when the admin approves the account.
     if (preferredRoom) {
       const exists = unwrap(
         await supabase.from('rooms').select('id').eq('room_number', preferredRoom).limit(1)
@@ -164,7 +180,6 @@ router.post(
       if (exists.length) {
         const check = await checkRoomHasBed(preferredRoom);
         if (!check.ok) return fail(res, 409, check.message);
-        assigned = true;
       }
     }
 
@@ -179,15 +194,13 @@ router.post(
         email: email || null,
         address: address || null,
         preferred_room: preferredRoom || null,
-        move_in_date: assigned ? todayString() : null,
-        next_due_date: assigned ? addMonths(todayString(), 1) : null,
+        status: 'Pending', // cannot log in until the admin approves
       })
     );
-    if (assigned) await syncRoomStatuses();
 
     return res.status(201).json({
       success: true,
-      message: 'Registration successful. You can now login.',
+      message: 'Registration submitted! Please wait for the admin to approve your account before you can log in.',
     });
   })
 );
@@ -208,7 +221,7 @@ router.post(
     if (!identifier) return fail(res, 400, 'Enter your username or email.');
 
     const user = await findByIdentifier(identifier);
-    if (!user || !user.email || user.status === 'Disabled') return res.json(generic);
+    if (!user || !user.email || (user.status && user.status !== 'Active')) return res.json(generic);
 
     // Only one code per minute per account.
     const recent = unwrap(
