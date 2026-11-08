@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api.js';
 import { dateTime, peso } from '../../utils.js';
+import { useBlobUrl } from '../../useBlobUrl.js';
 import { Badge, Btn, Card, Field, Input, Select, Table } from './ui.jsx';
 
 const textArea = {
@@ -295,6 +296,7 @@ function GcashQrCard({ data, run }) {
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState('');
   const has = data.settings.gcash_has_qr;
+  const { url: qrPreview } = useBlobUrl(has ? `/gcash-qr?v=${data.settings.gcash_qr_version}` : null);
 
   async function onPick(e) {
     const file = e.target.files?.[0];
@@ -320,9 +322,9 @@ function GcashQrCard({ data, run }) {
         In the GCash app open <b>QR Code / Receive Money</b>, take a screenshot, and upload it here. Boarders will see
         this QR on their dashboard and pay by scanning it.
       </p>
-      {has && (
+      {has && qrPreview && (
         <img
-          src={`/api/gcash-qr?v=${data.settings.gcash_qr_version}`}
+          src={qrPreview}
           alt="Current GCash QR"
           style={{ width: 200, maxWidth: '100%', borderRadius: 10, background: '#fff', padding: 6, display: 'block', marginBottom: 10 }}
         />

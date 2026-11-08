@@ -12,7 +12,7 @@ export default function GcashCard({ gcash, history, roomRate, rentPaid, onDone }
   const [copied, setCopied] = useState(false);
   const set = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
-  // Rent can only be paid once a month: switch to Advance Payment when this month is already covered.
+
   useEffect(() => {
     if (rentPaid) setForm((f) => (f.type === 'Rent' ? { ...f, type: 'Advance Payment' } : f));
   }, [rentPaid]);
