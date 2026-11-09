@@ -408,11 +408,11 @@ function Overview({ data, ownerName }) {
                       <div className="owner-progress">
                         <div className="owner-progress-track">
                           <div
-                            className={`owner-progress-fill ${r.occupancyPercent ? 'red' : ''}`}
+                            className={`owner-progress-fill ${r.beds_left === 0 ? 'red' : r.occupancyPercent ? 'orange' : ''}`}
                             style={{ width: `${r.occupancyPercent}%` }}
                           />
                         </div>
-                        <span>{r.occupancyPercent}%</span>
+                        <span>{r.status === 'Maintenance' ? '-' : r.beds_left === 0 ? 'Full' : `${r.beds_left} left`}</span>
                       </div>
                     </td>
                   </tr>

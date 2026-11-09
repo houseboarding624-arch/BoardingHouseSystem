@@ -1,13 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
 import Notice from '../components/Notice.jsx';
 import { PASSWORD_RULES, isStrongPassword } from '../passwordRules.js';
+import { USERNAME_ERROR, USERNAME_HINT, capitalizeWords, cleanUsername, isValidUsername } from '../textRules.js';
 
 // The boarding house has Room 1 to Room 12 only.
 const MAX_ROOM = 12;
 const ROOM_ERROR = `Room does not exist. Rooms are only up to Room ${MAX_ROOM}.`;
-const roomIsValid = (value) => value === '' || (/^\d{1,2}$/.test(value) && Number(value) >= 1 && Number(value) <= MAX_ROOM);
+const roomLabel = (r) => {
+  const people = `${r.beds_taken} of ${r.beds} boarders`;
+  if (r.status === 'Maintenance') return `Room ${r.room_number} - Under maintenance`;
+  if (r.status === 'Full') return `Room ${r.room_number} - Full (${people})`;
+  return `Room ${r.room_number} - Available (${people}, ${r.beds_left} bed${r.beds_left === 1 ? '' : 's'} left)`;
+};
 
 const EMPTY = {
   username: '',
@@ -27,6 +33,19 @@ export default function Register() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rooms, setRooms] = useState(null);
+  const [roomsError, setRoomsError] = useState('');
+
+  useEffect(() => {
+    let alive = true;
+    api
+      .get('/auth/rooms')
+      .then((data) => alive && setRooms(data.rooms))
+      .catch((err) => alive && setRoomsError(err.message));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const update = (field) => (event) => setForm({ ...form, [field]: event.target.value });
 
@@ -34,6 +53,10 @@ export default function Register() {
     event.preventDefault();
     setError('');
 
+    if (!isValidUsername(form.username)) {
+      setError(USERNAME_ERROR);
+      return;
+    }
     if (!isStrongPassword(form.password)) {
       setError('Password does not meet all the requirements.');
       return;
@@ -42,15 +65,15 @@ export default function Register() {
       setError('Passwords do not match.');
       return;
     }
-    if (!roomIsValid(form.preferred_room.trim())) {
-      setError(ROOM_ERROR);
+    const chosen = rooms?.find((r) => String(r.room_number) === form.preferred_room);
+    if (form.preferred_room && (!chosen || chosen.status !== 'Available')) {
+      setError(chosen ? `Room ${chosen.room_number} is not available. Please choose another room.` : ROOM_ERROR);
       return;
     }
 
     setBusy(true);
     try {
       const { confirm_password: _ignored, ...payload } = form;
-      payload.preferred_room = payload.preferred_room.trim() ? String(Number(payload.preferred_room)) : '';
       const data = await api.post('/auth/register', payload);
       navigate(`/login?message=${encodeURIComponent(data.message)}`);
     } catch (err) {
@@ -79,7 +102,17 @@ export default function Register() {
           <form className="form two-column" onSubmit={handleSubmit}>
             <div>
               <label>Username</label>
-              <input value={form.username} onChange={update('username')} maxLength={100} required />
+              <input
+                value={form.username}
+                onChange={(e) => setForm({ ...form, username: cleanUsername(e.target.value) })}
+                maxLength={12}
+                autoComplete="username"
+                aria-invalid={form.username !== '' && !isValidUsername(form.username)}
+                required
+              />
+              <small style={{ color: form.username === '' || isValidUsername(form.username) ? '#64748b' : '#b91c1c', fontWeight: 600 }}>
+                {USERNAME_HINT}
+              </small>
             </div>
             <div className="pw-block">
               <label htmlFor="reg-password">Password</label>
@@ -125,7 +158,12 @@ export default function Register() {
             </div>
             <div>
               <label>Full Name</label>
-              <input value={form.full_name} onChange={update('full_name')} maxLength={150} required />
+              <input
+                value={form.full_name}
+                onChange={(e) => setForm({ ...form, full_name: capitalizeWords(e.target.value) })}
+                maxLength={150}
+                required
+              />
             </div>
             <div>
               <label htmlFor="reg-gender">Gender</label>
@@ -151,20 +189,23 @@ export default function Register() {
             </div>
             <div>
               <label>Preferred Room</label>
-              <input
-                value={form.preferred_room}
-                onChange={(e) => setForm({ ...form, preferred_room: e.target.value.replace(/\D/g, '').slice(0, 3) })}
-                inputMode="numeric"
-                placeholder={`1 to ${MAX_ROOM}`}
-                aria-invalid={!roomIsValid(form.preferred_room.trim())}
-              />
-              {!roomIsValid(form.preferred_room.trim()) && (
-                <small style={{ color: '#b91c1c', fontWeight: 700 }}>{ROOM_ERROR}</small>
-              )}
+              <select value={form.preferred_room} onChange={update('preferred_room')}>
+                <option value="">{rooms ? 'Select a room (optional)' : roomsError ? 'Rooms could not be loaded' : 'Loading rooms…'}</option>
+                {(rooms ?? []).map((r) => (
+                  <option key={r.room_number} value={r.room_number} disabled={r.status !== 'Available'}>
+                    {roomLabel(r)}
+                  </option>
+                ))}
+              </select>
+              {roomsError && <small style={{ color: '#b91c1c', fontWeight: 700 }}>{roomsError}</small>}
             </div>
             <div>
               <label>Address</label>
-              <input value={form.address} onChange={update('address')} maxLength={255} />
+              <input
+                value={form.address}
+                onChange={(e) => setForm({ ...form, address: capitalizeWords(e.target.value) })}
+                maxLength={255}
+              />
             </div>
             <div className="full">
               <button className="btn btn-primary" type="submit" disabled={busy}>

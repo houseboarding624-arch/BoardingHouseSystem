@@ -9,11 +9,15 @@ import {
   clearSessionCookie,
 } from '../middleware/auth.js';
 import { rateLimit } from '../middleware/rateLimit.js';
-import { checkRoomHasBed } from '../services/rooms.js';
+import { checkRoomHasBed, listRoomsWithBeds } from '../services/rooms.js';
 import { sendMail } from '../mailer.js';
 import { config } from '../config.js';
 
 const MAX_ROOM = 12;
+
+// Create Account rules. Keep in sync with src/textRules.js
+const USERNAME_RULE = /^[A-Z][A-Za-z0-9]{7,11}$/;
+const capitalizeWords = (value) => value.replace(/(^|\s)(\p{L})/gu, (_, space, letter) => space + letter.toUpperCase());
 const router = Router();
 
 const ROLES = ['Admin', 'Owner', 'Boarder'];
@@ -26,6 +30,11 @@ const PASSWORD_RULES = [
   [(p) => /[0-9]/.test(p), 'a number'],
   [(p) => /[^A-Za-z0-9]/.test(p), 'a special character'],
 ];
+const roomsLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  message: 'Too many requests. Please try again in a minute.',
+});
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
@@ -118,16 +127,28 @@ router.post(
   })
 );
 
+// Public: room numbers with how many beds are taken / left (no names), for the Create Account dropdown.
+router.get(
+  '/rooms',
+  roomsLimiter,
+  asyncHandler(async (req, res) => {
+    const rooms = (await listRoomsWithBeds())
+      .filter((r) => /^\d+$/.test(r.room_number) && Number(r.room_number) >= 1 && Number(r.room_number) <= MAX_ROOM)
+      .sort((a, b) => Number(a.room_number) - Number(b.room_number));
+    res.json({ success: true, rooms });
+  })
+);
+
 router.post(
   '/register',
   asyncHandler(async (req, res) => {
     const body = req.body ?? {};
     const username = String(body.username ?? '').trim();
     const password = String(body.password ?? '');
-    const fullName = String(body.full_name ?? '').trim();
+    const fullName = capitalizeWords(String(body.full_name ?? '').trim());
     const contact = String(body.contact ?? '').trim();
     const email = String(body.email ?? '').trim();
-    const address = String(body.address ?? '').trim();
+    const address = capitalizeWords(String(body.address ?? '').trim());
     let preferredRoom = String(body.preferred_room ?? '').trim();
     const gender = String(body.gender ?? '').trim();
 
@@ -152,8 +173,11 @@ router.post(
     if (missingRules.length) {
       return fail(res, 400, `Password must contain ${missingRules.join(', ')}.`);
     }
-    if (username.length > 100 || fullName.length > 150) {
-      return fail(res, 400, 'Username or full name is too long.');
+    if (!USERNAME_RULE.test(username)) {
+      return fail(res, 400, 'Username must be 8 to 12 characters, start with a capital letter, and use letters and numbers only.');
+    }
+    if (fullName.length > 150) {
+      return fail(res, 400, 'Full name is too long.');
     }
     if (email && !/^\S+@\S+\.\S+$/.test(email)) {
       return fail(res, 400, 'Please enter a valid email address.');

@@ -156,6 +156,9 @@ Run the migration `supabase/migrations/20261018000000_advance_gender_reset.sql` 
   (valid 15 minutes, 5 tries, stored hashed), then sets a new password. Needs the Gmail/SMTP settings; in
   development the code is printed in the backend console. No email on the account? Admin > Tenants > *Reset
   password* creates a temporary password, and the boarder changes it in *Change Password* on their dashboard.
+- **4 beds per room:** every room has 4 beds. Rooms, the Vacancy Board and the boarder dashboard show how many beds are taken and how many are left; a full room cannot take more boarders. Run the migration `20261111000000_four_beds_per_room.sql`.
+- **Room dropdown on Create Account:** the Preferred Room field lists Room 1-12 with how many boarders are in each (for example "Room 3 - Available (2 of 4 boarders, 2 beds left)"); full and under-maintenance rooms cannot be picked. Run the migration `20261112000000_rooms_1_to_12.sql` to create any missing rooms.
+- **Create Account rules:** username is 8-12 characters, starts with a capital letter, letters and numbers only (the login is case-sensitive, so log in with the same capital letter); full name and address start every word with a capital letter; contact is up to 11 digits.
 - **Registration approval:** new boarders are *Pending* and cannot log in until the admin clicks **Approve** in *Registrations* (or **Decline**). Run the migration `20261110000000_registration_approval.sql` first.
 - **Gender:** Male / Female is chosen on the Register page and shown in Tenants and the Owner's Boarders table.
 - **Rent once a month:** a boarder can't pay Rent again in the same calendar month (admin form and GCash form

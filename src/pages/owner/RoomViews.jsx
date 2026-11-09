@@ -42,14 +42,14 @@ export function RoomsView({ data, run }) {
           </Btn>
         </form>
         <p className="ov-hint">
-          Add as many rooms as you need, with any number of boarders in each. A room turns <b>Occupied</b> by itself as
-          soon as it has a boarder, and goes back to <b>Available</b> when it has none.
+          Every room has <b>4 beds</b>. A room stays <b>Available</b> while it has a free bed and turns <b>Occupied</b>{' '}
+          by itself when all 4 beds are taken. The table shows how many beds are still needed to fill each room.
         </p>
       </Card>
 
       <Card title={`Rooms & Beds (${data.rooms.length})`}>
         <Table
-          head={['Room', 'Rate', 'Boarders', 'Status', 'Actions']}
+          head={['Room', 'Rate', 'Beds', 'Boarders', 'Status', 'Actions']}
           empty="No rooms yet. Add one above."
         >
           {data.rooms.map((r) => (
@@ -58,6 +58,22 @@ export function RoomsView({ data, run }) {
                 <b>Room {r.room_number}</b>
               </td>
               <td>{peso(r.monthly_rate)}</td>
+              <td>
+                {r.status === 'Maintenance' ? (
+                  '-'
+                ) : (
+                  <>
+                    <b>
+                      {r.beds_taken}/{r.beds}
+                    </b>{' '}
+                    {r.beds_left > 0 ? (
+                      <Badge tone="green">{r.beds_left} bed{r.beds_left === 1 ? '' : 's'} left</Badge>
+                    ) : (
+                      <Badge tone="red">Full</Badge>
+                    )}
+                  </>
+                )}
+              </td>
               <td>
                 {r.tenantList.length ? `${r.tenantList.length} - ${r.tenantList.map((t) => t.full_name).join(', ')}` : '-'}
               </td>
@@ -128,7 +144,7 @@ export function VacancyView({ data, run }) {
     data.reservations.filter((r) => r.room_number === room.room_number && r.status !== 'Cancelled').length;
 
   return (
-    <Card title={`Vacancy Board - ${data.stats.availableRooms} available room(s)`}>
+    <Card title={`Vacancy Board - ${data.stats.freeBeds} of ${data.stats.totalBeds} beds free`}>
       <div className="ov-room-grid">
         {data.rooms.map((r) => (
           <div key={r.id} className={`ov-room-card ${r.status.toLowerCase()}`}>
@@ -139,10 +155,17 @@ export function VacancyView({ data, run }) {
             <div className="property-sub">{peso(r.monthly_rate)} / month</div>
             <div className="owner-progress" style={{ marginTop: '10px' }}>
               <div className="owner-progress-track">
-                <div className={`owner-progress-fill ${r.occupancyPercent ? 'red' : ''}`} style={{ width: `${r.occupancyPercent}%` }} />
+                <div
+                  className={`owner-progress-fill ${r.beds_left === 0 ? 'red' : r.occupancyPercent ? 'orange' : ''}`}
+                  style={{ width: `${r.occupancyPercent}%` }}
+                />
               </div>
               <span>
-                {r.tenantList.length} boarder(s)
+                {r.status === 'Maintenance'
+                  ? 'Under maintenance'
+                  : r.beds_left === 0
+                    ? `Full - ${r.beds_taken}/${r.beds} beds`
+                    : `${r.beds_taken}/${r.beds} beds - ${r.beds_left} left`}
               </span>
             </div>
             <div className="property-sub" style={{ marginTop: '8px' }}>

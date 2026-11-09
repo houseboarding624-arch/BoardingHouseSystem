@@ -7,7 +7,7 @@ import { requireRole } from '../middleware/auth.js';
 import { todayString } from '../utils/time.js';
 import { addMonths, isDate } from '../utils/dates.js';
 import { getSettings, saveSetting } from '../services/settings.js';
-import { syncRoomStatuses, tenantsByRoom, checkRoomHasBed } from '../services/rooms.js';
+import { syncRoomStatuses, tenantsByRoom, checkRoomHasBed, BEDS_PER_ROOM } from '../services/rooms.js';
 import { notifyUser } from '../services/notify.js';
 import { audit } from '../services/audit.js';
 import { recordPayment, hasRentThisMonth, RENT_ALREADY_PAID } from '../services/payments.js';
@@ -130,7 +130,7 @@ router.get(
         ...room,
         tenantList,
         tenants: tenantList.length,
-        occupancyPercent: tenantList.length ? 100 : 0,
+        occupancyPercent: Math.round((tenantList.length / BEDS_PER_ROOM) * 100),
       };
     });
 
@@ -164,9 +164,11 @@ router.get(
         totalRooms: rooms.length,
         occupiedRooms: countStatus('Occupied'),
         availableRooms: countStatus('Available'),
+        totalBeds: usableRooms.length * BEDS_PER_ROOM,
+        freeBeds: usableRooms.reduce((sum, r) => sum + r.beds_left, 0),
         maintenanceRooms: countStatus('Maintenance'),
         occupancyRate: usableRooms.length
-          ? Math.round((countStatus('Occupied') / usableRooms.length) * 100)
+          ? Math.round(((usableRooms.length * BEDS_PER_ROOM - usableRooms.reduce((sum, r) => sum + r.beds_left, 0)) / (usableRooms.length * BEDS_PER_ROOM)) * 100)
           : 0,
         tenants: activeBoarders.length,
         disabled: boarderRows.length - activeBoarders.length,
@@ -334,7 +336,7 @@ router.patch(
     if ('preferred_room' in body) {
       const roomNumber = text(body.preferred_room, 20);
       if (roomNumber) {
-        const check = await checkRoomHasBed(roomNumber);
+        const check = await checkRoomHasBed(roomNumber, boarder.id);
         if (!check.ok) return fail(res, 409, check.message);
         patch.preferred_room = roomNumber;
         if (!boarder.move_in_date) patch.move_in_date = todayString();
@@ -401,7 +403,7 @@ router.post(
     const boarder = found[0];
 
     if (boarder.preferred_room) {
-      const check = await checkRoomHasBed(boarder.preferred_room);
+      const check = await checkRoomHasBed(boarder.preferred_room, boarder.id);
       if (!check.ok) return fail(res, 409, `${check.message} Assign another room first.`);
     }
     unwrap(
