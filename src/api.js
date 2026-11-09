@@ -30,6 +30,8 @@ async function request(path, { method = 'GET', body } = {}) {
       : `The server did not answer correctly (HTTP ${response.status}). Is the backend running?`;
     const error = new Error(data?.message || fallback);
     error.status = response.status;
+    // The session ended (expired, or the account was disabled/archived): let the app log the user out.
+    if (response.status === 401 && !path.startsWith('/auth/login')) window.dispatchEvent(new Event('bh:session-ended'));
     error.data = data;
     throw error;
   }

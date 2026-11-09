@@ -19,8 +19,59 @@ function DueEditor({ boarder, run }) {
   );
 }
 
+/** Small popup: choose why the boarder is leaving, then archive the account. */
+function ArchiveDialog({ boarder, onClose, run }) {
+  const [type, setType] = useState('Moved out');
+  const [reason, setReason] = useState('');
+  const [busy, setBusy] = useState(false);
+  return (
+    <div
+      style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,.55)', display: 'grid', placeItems: 'center', zIndex: 50, padding: '16px' }}
+      onClick={onClose}
+    >
+      <div
+        style={{ background: '#fff', borderRadius: '12px', padding: '20px', width: '100%', maxWidth: '420px', boxShadow: '0 20px 50px rgba(0,0,0,.25)' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 style={{ margin: '0 0 6px' }}>Move out {boarder.full_name}?</h3>
+        <p className="property-sub" style={{ marginBottom: '12px' }}>
+          The account is disabled right away (no login, no QR scan), the bed becomes free, and the boarder goes to
+          Archives. You can enable the account again from there.
+        </p>
+        <Field label="REASON FOR LEAVING">
+          <Select value={type} onChange={(e) => setType(e.target.value)}>
+            <option value="Moved out">Moved out</option>
+            <option value="Transferred">Transferred to another boarding house</option>
+          </Select>
+        </Field>
+        <div style={{ height: '10px' }} />
+        <Field label="NOTE (OPTIONAL)">
+          <Input value={reason} onChange={(e) => setReason(e.target.value)} maxLength={255} placeholder="e.g. Graduated, new boarding house near school" />
+        </Field>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '16px' }}>
+          <Btn tone="ghost" onClick={onClose}>
+            Cancel
+          </Btn>
+          <Btn
+            tone="danger"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              await run(() => api.post(`/owner/tenants/${boarder.id}/archive`, { type, reason }));
+              onClose();
+            }}
+          >
+            Archive account
+          </Btn>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function TenantsView({ data, run }) {
   const [filter, setFilter] = useState('Active');
+  const [archiving, setArchiving] = useState(null);
   const list = data.boarders.filter((b) =>
     filter === 'All' ? true : filter === 'Disabled' ? b.status === 'Disabled' : b.status !== 'Disabled'
   );
@@ -77,9 +128,14 @@ export function TenantsView({ data, run }) {
             </td>
             <td className="ov-actions">
               {b.status === 'Disabled' ? (
-                <Btn small onClick={() => run(() => api.post(`/owner/tenants/${b.id}/reinstate`))}>
-                  Enable account
-                </Btn>
+                <>
+                  <Btn small onClick={() => run(() => api.post(`/owner/tenants/${b.id}/reinstate`))}>
+                    Enable account
+                  </Btn>
+                  <Btn small tone="ghost" onClick={() => setArchiving(b)}>
+                    Move out
+                  </Btn>
+                </>
               ) : (
                 <>
                   <Btn small tone="ghost" onClick={() => run(() => api.post(`/owner/tenants/${b.id}/remind`))}>
@@ -111,15 +167,95 @@ export function TenantsView({ data, run }) {
                   >
                     Disable
                   </Btn>
+                  <Btn small tone="ghost" onClick={() => setArchiving(b)}>
+                    Move out
+                  </Btn>
                 </>
               )}
             </td>
           </tr>
         ))}
       </Table>
+      {archiving && <ArchiveDialog boarder={archiving} onClose={() => setArchiving(null)} run={run} />}
+      <p className="ov-hint">
+        Disable is temporary (unpaid rent, etc.). Use Move out when a boarder leaves or transfers to another boarding
+        house; they are moved to Archives.
+      </p>
       <p className="ov-hint">
         A boarder with a due date gets a Gmail notice on the due date if unpaid, and is disabled automatically after
         the grace period ({data.settings.grace_days} days). Recording a rent payment moves the due date one month ahead.
+      </p>
+    </Card>
+  );
+}
+
+const fmtDate = (value) => (value ? new Date(value).toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }) : '-');
+
+export function ArchivesView({ data, run }) {
+  const [search, setSearch] = useState('');
+  const [type, setType] = useState('All');
+  const q = search.trim().toLowerCase();
+  const list = (data.archived ?? []).filter(
+    (b) =>
+      (type === 'All' || b.archive_type === type) &&
+      (!q || `${b.full_name} ${b.username} ${b.email ?? ''} ${b.contact ?? ''}`.toLowerCase().includes(q))
+  );
+
+  return (
+    <Card
+      title={`Archives (${list.length})`}
+      action={
+        <div style={{ display: 'flex', gap: '6px' }}>
+          <Input placeholder="Search name..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ marginTop: 0, width: '170px' }} />
+          <Select value={type} onChange={(e) => setType(e.target.value)} style={{ width: 'auto', marginTop: 0 }}>
+            <option>All</option>
+            <option>Moved out</option>
+            <option>Transferred</option>
+          </Select>
+        </div>
+      }
+    >
+      <Table head={['Boarder', 'Contact', 'Last room', 'Left on', 'Reason', 'Account', 'Actions']} empty="No archived boarders.">
+        {list.map((b) => (
+          <tr key={b.id}>
+            <td>
+              <b>{b.full_name}</b>
+              <div className="property-sub">
+                @{b.username}
+                {b.gender ? ` · ${b.gender}` : ''}
+              </div>
+            </td>
+            <td>
+              {b.contact || '-'}
+              <div className="property-sub">{b.email || 'No email'}</div>
+            </td>
+            <td>{b.preferred_room ? `Room ${b.preferred_room}` : '-'}</td>
+            <td>{fmtDate(b.archived_at)}</td>
+            <td>
+              <Badge tone={b.archive_type === 'Transferred' ? 'blue' : 'gray'}>{b.archive_type || 'Archived'}</Badge>
+              <div className="property-sub">{b.archive_reason || ''}</div>
+            </td>
+            <td>
+              <Badge tone="red">Disabled</Badge>
+            </td>
+            <td className="ov-actions">
+              <Btn
+                small
+                onClick={() =>
+                  window.confirm(
+                    `Enable ${b.full_name}'s account again? They return to Tenants as Active and the next due date is set one month from today.`
+                  ) && run(() => api.post(`/owner/tenants/${b.id}/reinstate`))
+                }
+              >
+                Enable account
+              </Btn>
+            </td>
+          </tr>
+        ))}
+      </Table>
+      <p className="ov-hint">
+        Archived boarders cannot log in or scan the QR, and they do not use a bed. Their payment and attendance history
+        is kept. Enabling an account brings the boarder back to Tenants (the old room must still have a free bed).
       </p>
     </Card>
   );
@@ -291,7 +427,7 @@ export function UsersView({ data }) {
             </td>
             <td>{u.email || '-'}</td>
             <td>
-              <Badge tone={{ Disabled: 'red', Pending: 'orange', Declined: 'red' }[u.status] || 'green'}>{u.status || 'Active'}</Badge>
+              <Badge tone={{ Disabled: 'red', Pending: 'orange', Declined: 'red', Archived: 'gray' }[u.status] || 'green'}>{u.status || 'Active'}</Badge>
             </td>
           </tr>
         ))}

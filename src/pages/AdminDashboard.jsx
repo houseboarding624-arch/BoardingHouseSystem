@@ -9,7 +9,7 @@ import SideLayout from '../components/SideLayout.jsx';
 import ReceiptModal from '../components/ReceiptModal.jsx';
 import { dateTime, peso, useBodyClass } from '../utils.js';
 
-const VIEW_KEYS = ['overview', 'boarders', 'attendance', 'payments', 'gcash', 'reports'];
+const VIEW_KEYS = ['overview', 'boarders', 'archives', 'attendance', 'payments', 'gcash', 'reports'];
 
 function PageHead({ eyebrow, title, hint, action }) {
   return (
@@ -73,6 +73,7 @@ export default function AdminDashboard() {
   const boarders = data?.boarders ?? [];
   const payments = data?.payments ?? [];
   const attendance = data?.attendance ?? [];
+  const archived = data?.archived ?? [];
   const stats = data?.stats;
 
   const groups = [
@@ -80,6 +81,7 @@ export default function AdminDashboard() {
       items: [
         { icon: '◧', label: 'Dashboard', view: 'overview' },
         { icon: '♟', label: 'Boarders', view: 'boarders' },
+        { icon: '🗄', label: 'Archives', view: 'archives' },
         { icon: '◔', label: 'Attendance', view: 'attendance' },
       ],
     },
@@ -200,6 +202,64 @@ export default function AdminDashboard() {
                     <tr>
                       <td className="admin-empty" colSpan="7">
                         No boarders found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      )}
+
+      {current === 'archives' && (
+        <>
+          <PageHead
+            eyebrow="ARCHIVES"
+            title="Archives"
+            hint="Boarders who moved out or transferred to another boarding house. Their accounts are disabled. The admin can enable them again."
+          />
+          <section className="admin-card admin-table-card">
+            <div className="admin-section-heading">
+              <h2>Archived boarders</h2>
+              <span className="admin-badge">{archived.length} total</span>
+            </div>
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Last room</th>
+                    <th>Left on</th>
+                    <th>Reason</th>
+                    <th>Account</th>
+                    <th>Contact</th>
+                    <th>Email</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {archived.map((b) => (
+                    <tr key={b.id}>
+                      <td>{b.full_name}</td>
+                      <td>{b.username}</td>
+                      <td>{b.preferred_room || '-'}</td>
+                      <td>{b.archived_at ? new Date(b.archived_at).toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }) : '-'}</td>
+                      <td>
+                        <span className="admin-badge">{b.archive_type || 'Archived'}</span>
+                        {b.archive_reason ? ` ${b.archive_reason}` : ''}
+                      </td>
+                      <td>
+                        <span className="bd-pill bad">Disabled</span>
+                      </td>
+                      <td>{b.contact || '-'}</td>
+                      <td>{b.email || '-'}</td>
+                    </tr>
+                  ))}
+                  {!archived.length && (
+                    <tr>
+                      <td className="admin-empty" colSpan="8">
+                        No archived boarders.
                       </td>
                     </tr>
                   )}

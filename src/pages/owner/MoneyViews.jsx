@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { api } from '../../api.js';
 import ReceiptModal from '../../components/ReceiptModal.jsx';
-import { peso } from '../../utils.js';
+import { peso, MIN_PAYMENT, MAX_PAYMENT } from '../../utils.js';
 import { Badge, Btn, Card, Field, Input, Select, Table, billingText, billingToneOf, downloadCsv, dueDateStyle, dueRowClass } from './ui.jsx';
 
 export function BillingView({ data, run }) {
@@ -97,8 +97,8 @@ function PaymentForm({ data, run, fixedType }) {
             ))}
           </Select>
         </Field>
-        <Field label="AMOUNT">
-          <Input type="number" min="1" step="0.01" value={form.amount} onChange={set('amount')} required />
+        <Field label={`AMOUNT (₱${MIN_PAYMENT.toLocaleString()} - ₱${MAX_PAYMENT.toLocaleString()})`}>
+          <Input type="number" min={MIN_PAYMENT} max={MAX_PAYMENT} step="0.01" value={form.amount} onChange={set('amount')} required />
         </Field>
         <Field label="DATE">
           <Input type="date" value={form.payment_date} onChange={set('payment_date')} required />
@@ -356,6 +356,7 @@ export function ReportsView({ data }) {
           <div><span>Active tenants</span><b>{s.tenants}</b></div>
           <div><span>Overdue tenants</span><b>{s.overdue}</b></div>
           <div><span>Disabled</span><b>{s.disabled}</b></div>
+          <div><span>Archived</span><b>{s.archived ?? 0}</b></div>
         </div>
       </Card>
     </>

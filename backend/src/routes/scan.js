@@ -37,6 +37,9 @@ router.post(
     if (person.status === 'Pending' || person.status === 'Declined') {
       return fail(res, 403, 'Your account is not approved yet.');
     }
+    if (person.status === 'Archived') {
+      return fail(res, 403, 'Your account is archived. Please contact the owner.');
+    }
     if (person.status === 'Disabled') {
       return fail(res, 403, 'Your account is disabled. Please contact the owner.');
     }

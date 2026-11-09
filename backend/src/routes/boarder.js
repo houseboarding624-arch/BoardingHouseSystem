@@ -7,7 +7,7 @@ import { syncRoomStatuses } from '../services/rooms.js';
 import { getSettings } from '../services/settings.js';
 import { audit } from '../services/audit.js';
 import { billingState } from '../services/scheduler.js';
-import { hasRentThisMonth, RENT_ALREADY_PAID } from '../services/payments.js';
+import { hasRentThisMonth, RENT_ALREADY_PAID, paymentAmountError } from '../services/payments.js';
 import { todayString } from '../utils/time.js';
 
 const router = Router();
@@ -177,9 +177,8 @@ router.post(
     const sender = text(req.body?.sender_number, 20);
     const note = text(req.body?.note, 255);
 
-    if (!Number.isFinite(amount) || amount <= 0 || amount > 100000) {
-      return fail(res, 400, 'Enter a valid amount.');
-    }
+    const amountError = paymentAmountError(amount);
+    if (amountError) return fail(res, 400, amountError);
     if (!PAYMENT_TYPES.includes(type)) return fail(res, 400, 'Invalid payment type.');
     if (type === 'Rent' && (await hasRentThisMonth(req.user.id, todayString()))) {
       return fail(res, 409, RENT_ALREADY_PAID);

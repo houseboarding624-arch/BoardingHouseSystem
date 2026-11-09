@@ -21,6 +21,12 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    const onEnded = () => setUser(null);
+    window.addEventListener('bh:session-ended', onEnded);
+    return () => window.removeEventListener('bh:session-ended', onEnded);
+  }, []);
+
   const login = useCallback(async (credentials) => {
     const data = await api.post('/auth/login', credentials);
     setUser(data.user);

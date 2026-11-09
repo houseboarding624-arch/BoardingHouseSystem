@@ -118,6 +118,9 @@ router.post(
     if (user.role === 'Boarder' && user.status === 'Declined') {
       return fail(res, 403, 'Your registration was declined. Please contact the owner.');
     }
+    if (user.role === 'Boarder' && user.status === 'Archived') {
+      return fail(res, 403, 'This account is archived. Please contact the owner if you want to return.');
+    }
     if (user.role === 'Boarder' && user.status === 'Disabled') {
       return fail(res, 403, 'Your account has been disabled. Please contact the owner.');
     }

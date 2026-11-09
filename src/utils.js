@@ -2,6 +2,10 @@ import { useEffect } from 'react';
 
 const TZ = 'Asia/Manila';
 
+/** Allowed payment amount (pesos). Keep in sync with backend/src/services/payments.js. */
+export const MIN_PAYMENT = 1000;
+export const MAX_PAYMENT = 2000;
+
 export const peso = (value) =>
   `₱${Number(value || 0).toLocaleString('en-PH', {
     minimumFractionDigits: 2,

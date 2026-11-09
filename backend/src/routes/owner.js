@@ -23,7 +23,7 @@ const idOf = (req) => Number.parseInt(req.params.id, 10);
 const byId = (list) => new Map(list.map((item) => [Number(item.id), item]));
 
 const BOARDER_COLUMNS =
-  'id,username,full_name,gender,contact,email,address,preferred_room,status,move_in_date,next_due_date,terminated_at,termination_reason,created_at';
+  'id,username,full_name,gender,contact,email,address,preferred_room,status,move_in_date,next_due_date,terminated_at,termination_reason,archived_at,archive_type,archive_reason,created_at';
 
 function monthKeys(today, count) {
   const keys = [];
@@ -60,6 +60,15 @@ router.get(
         .eq('role', 'Boarder')
         .in('status', ['Pending', 'Declined'])
         .order('created_at', { ascending: true })
+    );
+    // Boarders who moved out or transferred: kept for records, never counted as tenants.
+    const archived = unwrap(
+      await supabase
+        .from('users')
+        .select(BOARDER_COLUMNS)
+        .eq('role', 'Boarder')
+        .eq('status', 'Archived')
+        .order('archived_at', { ascending: false })
     );
     const allUsers = unwrap(
       await supabase
@@ -117,7 +126,7 @@ router.get(
       await supabase.from('gcash_payments').select('*').order('id', { ascending: false }).limit(200)
     );
 
-    const people = byId(boarders);
+    const people = byId([...boarders, ...archived]);
     const roomMap = tenantsByRoom(boarders);
     const nameOf = (id, fallback = 'Unknown') => people.get(Number(id))?.full_name ?? fallback;
 
@@ -172,6 +181,7 @@ router.get(
           : 0,
         tenants: activeBoarders.length,
         disabled: boarderRows.length - activeBoarders.length,
+        archived: archived.length,
         overdue: activeBoarders.filter((b) => ['Overdue', 'Past grace'].includes(b.billing.state)).length,
         dueSoon: activeBoarders.filter((b) => b.billing.urgent).length,
         monthTotal: payments
@@ -194,6 +204,7 @@ router.get(
       rooms: roomRows,
       boarders: boarderRows,
       registrations,
+      archived,
       users: allUsers,
       payments: payments.map((p) => ({ ...p, full_name: nameOf(p.user_id) })),
       expenses,
@@ -393,14 +404,49 @@ router.post(
 );
 
 router.post(
+  '/tenants/:id/archive',
+  asyncHandler(async (req, res) => {
+    const id = idOf(req);
+    const found = unwrap(
+      await supabase.from('users').select('id,full_name,email,status').eq('id', id).eq('role', 'Boarder').limit(1)
+    );
+    if (!found.length) return fail(res, 404, 'Boarder not found.');
+    const boarder = found[0];
+    if (boarder.status === 'Archived') return fail(res, 409, `${boarder.full_name} is already archived.`);
+    if (!['Active', 'Disabled'].includes(boarder.status)) return fail(res, 409, 'Only active or disabled boarders can be archived.');
+
+    const type = text(req.body?.type, 20);
+    if (!['Moved out', 'Transferred'].includes(type)) return fail(res, 400, 'Choose Moved out or Transferred.');
+    const reason = text(req.body?.reason, 255) || (type === 'Transferred' ? 'Transferred to another boarding house' : 'Moved out');
+
+    unwrap(
+      await supabase
+        .from('users')
+        .update({
+          status: 'Archived',
+          archived_at: new Date().toISOString(),
+          archive_type: type,
+          archive_reason: reason,
+          due_notice_for: null,
+        })
+        .eq('id', id)
+    );
+    await syncRoomStatuses();
+    await audit(req.user, 'Tenant archived', `${boarder.full_name} - ${type}: ${reason}`);
+    res.json({ success: true, message: `${boarder.full_name} was archived. The account is disabled and the bed is free.` });
+  })
+);
+
+router.post(
   '/tenants/:id/reinstate',
   asyncHandler(async (req, res) => {
     const id = idOf(req);
     const found = unwrap(
-      await supabase.from('users').select('id,full_name,preferred_room').eq('id', id).eq('role', 'Boarder').limit(1)
+      await supabase.from('users').select('id,full_name,preferred_room,status').eq('id', id).eq('role', 'Boarder').limit(1)
     );
     if (!found.length) return fail(res, 404, 'Boarder not found.');
     const boarder = found[0];
+    const wasArchived = boarder.status === 'Archived';
 
     if (boarder.preferred_room) {
       const check = await checkRoomHasBed(boarder.preferred_room, boarder.id);
@@ -413,13 +459,16 @@ router.post(
           status: 'Active',
           terminated_at: null,
           termination_reason: null,
+          archived_at: null,
+          archive_type: null,
+          archive_reason: null,
           due_notice_for: null,
           next_due_date: addMonths(todayString(), 1),
         })
         .eq('id', id)
     );
     await syncRoomStatuses();
-    await audit(req.user, 'Tenant reinstated', boarder.full_name);
+    await audit(req.user, wasArchived ? 'Tenant restored from archive' : 'Tenant reinstated', boarder.full_name);
     res.json({ success: true, message: `${boarder.full_name} is active again. Next due date is one month from today.` });
   })
 );

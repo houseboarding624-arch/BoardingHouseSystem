@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../api.js';
-import { dateTime, peso } from '../../utils.js';
+import { dateTime, peso, MIN_PAYMENT, MAX_PAYMENT } from '../../utils.js';
 import { useBlobUrl } from '../../useBlobUrl.js';
 
 const TONE = { Pending: 'bd-pill warn', Approved: 'bd-pill ok', Rejected: 'bd-pill bad' };
@@ -109,9 +109,9 @@ export default function GcashCard({ gcash, history, roomRate, rentPaid, onDone }
 
           <form className="bd-form" onSubmit={submit}>
             <label>
-              Amount (₱)
-              <input type="number" min="1" step="0.01" required value={form.amount} onChange={set('amount')} placeholder={roomRate ? `Monthly rate: ${roomRate}` : ""} />
-              {roomRate > 0 && !rentPaid && (
+              Amount (₱{MIN_PAYMENT.toLocaleString()} - ₱{MAX_PAYMENT.toLocaleString()})
+              <input type="number" min={MIN_PAYMENT} max={MAX_PAYMENT} step="0.01" required value={form.amount} onChange={set('amount')} placeholder={roomRate ? `Monthly rate: ${roomRate}` : ""} />
+              {roomRate >= MIN_PAYMENT && roomRate <= MAX_PAYMENT && !rentPaid && (
                 <button type="button" className="bd-link" onClick={() => setForm({ ...form, amount: String(roomRate), type: 'Rent' })}>
                   Use my monthly rate (₱{roomRate})
                 </button>

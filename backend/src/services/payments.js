@@ -1,6 +1,18 @@
 import { supabase, unwrap } from '../supabase.js';
 import { addMonths } from '../utils/dates.js';
 
+/** Every payment must be between these amounts (in pesos). Keep in sync with src/utils.js. */
+export const MIN_PAYMENT = 1000;
+export const MAX_PAYMENT = 2000;
+
+/** Returns an error message when the amount is outside the allowed range, otherwise null. */
+export function paymentAmountError(amount) {
+  if (!Number.isFinite(amount) || amount < MIN_PAYMENT || amount > MAX_PAYMENT) {
+    return `Payment amount must be from ₱${MIN_PAYMENT.toLocaleString('en-PH')} to ₱${MAX_PAYMENT.toLocaleString('en-PH')}.`;
+  }
+  return null;
+}
+
 /**
  * Inserts a payment. A Rent payment moves the boarder's next due date one month ahead
  * (and starts the cycle from the payment date if none was set yet).

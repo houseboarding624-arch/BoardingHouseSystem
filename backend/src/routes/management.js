@@ -6,7 +6,7 @@ import { todayString } from '../utils/time.js';
 import { addMonths, isDate } from '../utils/dates.js';
 import { syncRoomStatuses } from '../services/rooms.js';
 import { audit } from '../services/audit.js';
-import { hasRentThisMonth, RENT_ALREADY_PAID } from '../services/payments.js';
+import { hasRentThisMonth, RENT_ALREADY_PAID, paymentAmountError } from '../services/payments.js';
 import { billingState } from '../services/scheduler.js';
 import { getSettings } from '../services/settings.js';
 
@@ -30,6 +30,15 @@ router.get(
         .eq('role', 'Boarder')
         .in('status', ['Active', 'Disabled'])
         .order('full_name', { ascending: true })
+    );
+    // Boarders who moved out or transferred (read-only list for the Owner).
+    const archived = unwrap(
+      await supabase
+        .from('users')
+        .select('id,username,full_name,contact,email,preferred_room,gender,archived_at,archive_type,archive_reason')
+        .eq('role', 'Boarder')
+        .eq('status', 'Archived')
+        .order('archived_at', { ascending: false })
     );
     const rooms = await syncRoomStatuses();
     const countRooms = (status) => rooms.filter((r) => r.status === status).length;
@@ -67,7 +76,7 @@ router.get(
       await supabase.from('gcash_payments').select('*').order('id', { ascending: false }).limit(100)
     );
 
-    const people = byId(boarders);
+    const people = byId([...boarders, ...archived]);
     const paymentsTotalToday = payments
       .filter((p) => p.payment_date === today)
       .reduce((sum, p) => sum + Number(p.amount), 0);
@@ -77,6 +86,7 @@ router.get(
       today,
       stats: {
         boarders: boarders.length,
+        archived: archived.length,
         rooms: roomCounts,
         dueSoon: boarderRows.filter((b) => b.billing.urgent).length,
         paymentsTotalToday,
@@ -94,6 +104,7 @@ router.get(
         full_name: people.get(Number(g.user_id))?.full_name ?? 'Unknown',
       })),
       boarders: boarderRows,
+      archived,
       payments: payments.map((p) => ({
         ...p,
         full_name: people.get(Number(p.user_id))?.full_name ?? 'Unknown',
@@ -138,8 +149,6 @@ router.post(
     if (
       !Number.isInteger(userId) ||
       userId <= 0 ||
-      !Number.isFinite(amount) ||
-      amount <= 0 ||
       !isDate(date) ||
       description.length > 255 ||
       proofRef.length > 255 ||
@@ -147,6 +156,8 @@ router.post(
     ) {
       return fail(res, 400, 'Invalid payment information.');
     }
+    const amountError = paymentAmountError(amount);
+    if (amountError) return fail(res, 400, amountError);
 
     // Make sure the payment is attached to a boarder, not an admin/owner account.
     const target = unwrap(

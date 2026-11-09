@@ -5,7 +5,7 @@ import { useAuth } from '../auth.jsx';
 import LogoutButton from '../components/LogoutButton.jsx';
 import { peso, useBodyClass } from '../utils.js';
 import { RoomsView, VacancyView } from './owner/RoomViews.jsx';
-import { TenantsView, ContractsView, ReservationsView, UsersView } from './owner/TenantViews.jsx';
+import { TenantsView, ArchivesView, ContractsView, ReservationsView, UsersView } from './owner/TenantViews.jsx';
 import {
   BillingView,
   PaymentsView,
@@ -42,6 +42,7 @@ const NAV = [
     items: [
       ['✔', 'Registrations', 'registrations'],
       ['♟', 'Tenants', 'tenants'],
+      ['🗄', 'Archives', 'archives'],
       ['▣', 'Contracts', 'contracts'],
       ['▧', 'Reservations', 'reservations'],
     ],
@@ -82,6 +83,7 @@ const VIEWS = {
   vacancy: VacancyView,
   registrations: RegistrationsView,
   tenants: TenantsView,
+  archives: ArchivesView,
   contracts: ContractsView,
   reservations: ReservationsView,
   billing: BillingView,
