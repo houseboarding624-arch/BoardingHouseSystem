@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
 import Notice from '../components/Notice.jsx';
 import { PASSWORD_RULES, isStrongPassword } from '../passwordRules.js';
-import { USERNAME_ERROR, USERNAME_HINT, capitalizeWords, cleanUsername, isValidUsername } from '../textRules.js';
+import { USERNAME_ERROR, capitalizeWords, cleanUsername, isValidUsername } from '../textRules.js';
 
 // The boarding house has Room 1 to Room 12 only.
 const MAX_ROOM = 12;
@@ -110,9 +110,6 @@ export default function Register() {
                 aria-invalid={form.username !== '' && !isValidUsername(form.username)}
                 required
               />
-              <small style={{ color: form.username === '' || isValidUsername(form.username) ? '#64748b' : '#b91c1c', fontWeight: 600 }}>
-                {USERNAME_HINT}
-              </small>
             </div>
             <div className="pw-block">
               <label htmlFor="reg-password">Password</label>
