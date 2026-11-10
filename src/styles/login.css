@@ -399,3 +399,8 @@
         animation: none;
     }
 }
+
+/* Register form: skipped required fields */
+.auth-card .form input.invalid,
+.auth-card .form select.invalid { border-color: #dc2626; background: #fef2f2; }
+.field-error { display: block; margin-top: 4px; color: #b91c1c; font-size: 13px; font-weight: 700; }

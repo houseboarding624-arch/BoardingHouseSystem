@@ -9,11 +9,12 @@ import RoomList from '../components/RoomList.jsx';
 import GcashCard from './boarder/GcashCard.jsx';
 import ReportCard from './boarder/ReportCard.jsx';
 import PasswordCard from './boarder/PasswordCard.jsx';
+import ProfileCard from './boarder/ProfileCard.jsx';
 import ReceiptModal from '../components/ReceiptModal.jsx';
 import { billingText } from './owner/ui.jsx';
-import { dateTime, peso, useBodyClass } from '../utils.js';
+import { dateTime, peso, timeOnly, useBodyClass } from '../utils.js';
 
-const VIEW_KEYS = ['overview', 'pay', 'payments', 'attendance', 'reports', 'notifications', 'password'];
+const VIEW_KEYS = ['overview', 'pay', 'payments', 'attendance', 'reports', 'notifications', 'profile', 'password'];
 
 function PageHead({ eyebrow, title, hint }) {
   return (
@@ -76,6 +77,7 @@ export default function BoarderDashboard() {
       items: [
         { icon: '📢', label: 'My Reports', view: 'reports' },
         { icon: '🔔', label: 'Notifications', view: 'notifications', badge: unread },
+        { icon: '👤', label: 'My Profile', view: 'profile' },
         { icon: '⚙', label: 'Change Password', view: 'password' },
       ],
     },
@@ -236,8 +238,8 @@ export default function BoarderDashboard() {
                     {attendance.map((a) => (
                       <tr key={a.attendance_date}>
                         <td>{a.attendance_date}</td>
-                        <td>{dateTime(a.time_in)}</td>
-                        <td>{dateTime(a.time_out)}</td>
+                        <td><b>{timeOnly(a.time_in)}</b></td>
+                        <td>{a.time_out ? <b>{timeOnly(a.time_out)}</b> : <span className="admin-muted">Not yet</span>}</td>
                         <td>
                           <span className="admin-badge">{a.status}</span>
                         </td>
@@ -305,6 +307,13 @@ export default function BoarderDashboard() {
                 </table>
               </div>
             </section>
+          </>
+        )}
+
+        {current === 'profile' && (
+          <>
+            <PageHead eyebrow="ACCOUNT" title="My Profile" hint="Check your details and correct your gender if needed." />
+            <ProfileCard user={user} onDone={load} />
           </>
         )}
 

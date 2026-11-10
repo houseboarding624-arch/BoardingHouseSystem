@@ -11,9 +11,10 @@ export default function Login() {
   const [form, setForm] = useState({ username: '', password: '', account_type: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [animating, setAnimating] = useState(false);
+  // Only one banner is shown at a time: a new login attempt clears the old message, and an error replaces it.
   const [error, setError] = useState(params.get('error') || '');
+  const [message, setMessage] = useState(params.get('error') ? '' : params.get('message') || '');
   const [busy, setBusy] = useState(false);
-  const message = params.get('message');
   const next = params.get('next');
   const destinationFor = (u) => (HOME_BY_ROLE[u.role] || '/');
 
@@ -32,11 +33,13 @@ export default function Login() {
   async function handleSubmit(event) {
     event.preventDefault();
     setError('');
+    setMessage('');
     setBusy(true);
     try {
       const loggedIn = await login(form);
       navigate(destinationFor(loggedIn), { replace: true });
     } catch (err) {
+      setMessage('');
       setError(err.message);
     } finally {
       setBusy(false);

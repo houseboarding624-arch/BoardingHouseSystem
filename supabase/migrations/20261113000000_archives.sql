@@ -1,4 +1,5 @@
-
+-- Boarders who moved out or transferred to another boarding house are archived.
+-- Archived accounts cannot log in or scan, no longer hold a bed, and can be restored (enabled) later.
 alter table public.users add column if not exists archived_at timestamptz;
 alter table public.users add column if not exists archive_type varchar(20);
 alter table public.users add column if not exists archive_reason varchar(255);

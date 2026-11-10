@@ -307,7 +307,7 @@ function Overview({ data, ownerName }) {
         <section className="owner-card owner-section">
           <div className="owner-card-pad">
             <div className="owner-card-title">
-              <h2>Boarders: Male / Female</h2>
+              <h2>Boarders: Male / Female / LGBTQ+</h2>
               <Link to="/admin#tenants">View tenants →</Link>
             </div>
             <GenderPie boarders={data.boarders} />

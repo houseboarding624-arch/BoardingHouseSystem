@@ -31,7 +31,7 @@ router.get(
     const users = unwrap(
       await supabase
         .from('users')
-        .select('id,username,full_name,contact,email,address,preferred_room,status,next_due_date,qr_token')
+        .select('id,username,full_name,gender,contact,email,address,preferred_room,status,next_due_date,qr_token')
         .eq('id', id)
         .limit(1)
     );
@@ -119,6 +119,24 @@ router.get(
       },
       roomRate: Number(rooms.find((r) => String(r.room_number) === String(user.preferred_room))?.monthly_rate ?? 0),
     });
+  })
+);
+
+// A boarder can fix a gender they picked by mistake.
+router.patch(
+  '/profile/gender',
+  requireRole('Boarder'),
+  asyncHandler(async (req, res) => {
+    const gender = text(req.body?.gender, 10);
+    if (!['Male', 'Female', 'LGBTQ+'].includes(gender)) return fail(res, 400, 'Please choose Male, Female or LGBTQ+.');
+
+    const found = unwrap(await supabase.from('users').select('id,gender').eq('id', req.user.id).limit(1));
+    if (!found.length) return fail(res, 404, 'Account not found.');
+    if (found[0].gender === gender) return res.json({ success: true, gender, message: 'Your gender is already set to that.' });
+
+    unwrap(await supabase.from('users').update({ gender }).eq('id', req.user.id));
+    await audit(req.user, 'Gender updated', `${found[0].gender || 'not set'} -> ${gender}`);
+    res.json({ success: true, gender, message: `Your gender was updated to ${gender}.` });
   })
 );
 

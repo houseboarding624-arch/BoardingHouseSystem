@@ -15,6 +15,21 @@ const roomLabel = (r) => {
   return `Room ${r.room_number} - Available (${people}, ${r.beds_left} bed${r.beds_left === 1 ? '' : 's'} left)`;
 };
 
+// Fields the boarder must fill in. A skipped one gets a red "Please fill out this field." under it.
+const REQUIRED = [
+  ['username', 'reg-username'],
+  ['password', 'reg-password'],
+  ['confirm_password', 'reg-confirm'],
+  ['full_name', 'reg-fullname'],
+  ['gender', 'reg-gender'],
+  ['contact', 'reg-contact'],
+  ['email', 'reg-email'],
+];
+
+function FieldError({ show }) {
+  return show ? <small className="field-error">Please fill out this field.</small> : null;
+}
+
 const EMPTY = {
   username: '',
   password: '',
@@ -35,6 +50,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [rooms, setRooms] = useState(null);
   const [roomsError, setRoomsError] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -47,11 +63,25 @@ export default function Register() {
     };
   }, []);
 
+  // A field shows the message only while it is still empty after a submit attempt, so it clears as soon as it is filled.
+  const isMissing = (field) => submitted && !String(form[field] ?? '').trim();
+  const invalid = (field) => (isMissing(field) ? 'invalid' : '');
+
   const update = (field) => (event) => setForm({ ...form, [field]: event.target.value });
 
   async function handleSubmit(event) {
     event.preventDefault();
     setError('');
+    setSubmitted(true);
+
+    const firstMissing = REQUIRED.find(([field]) => !String(form[field] ?? '').trim());
+    if (firstMissing) {
+      setError('Please fill out the highlighted fields.');
+      const el = document.getElementById(firstMissing[1]);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el?.focus({ preventScroll: true });
+      return;
+    }
 
     if (!isValidUsername(form.username)) {
       setError(USERNAME_ERROR);
@@ -99,10 +129,12 @@ export default function Register() {
 
           <Notice type="error">{error}</Notice>
 
-          <form className="form two-column" onSubmit={handleSubmit}>
+          <form className="form two-column" onSubmit={handleSubmit} noValidate>
             <div>
-              <label>Username</label>
+              <label htmlFor="reg-username">Username</label>
               <input
+                id="reg-username"
+                className={invalid('username')}
                 value={form.username}
                 onChange={(e) => setForm({ ...form, username: cleanUsername(e.target.value) })}
                 maxLength={12}
@@ -110,12 +142,14 @@ export default function Register() {
                 aria-invalid={form.username !== '' && !isValidUsername(form.username)}
                 required
               />
+              <FieldError show={isMissing('username')} />
             </div>
             <div className="pw-block">
               <label htmlFor="reg-password">Password</label>
               <div className="password-container">
                 <input
                   id="reg-password"
+                  className={invalid('password')}
                   type={showPassword ? 'text' : 'password'}
                   value={form.password}
                   onChange={update('password')}
@@ -131,6 +165,7 @@ export default function Register() {
                   {showPassword ? '🙈' : '👁'}
                 </button>
               </div>
+              <FieldError show={isMissing('password')} />
               <ul className="pw-rules" aria-label="Password requirements">
                 {PASSWORD_RULES.map((rule) => (
                   <li key={rule.id} className={rule.test(form.password) ? 'ok' : ''}>
@@ -143,46 +178,66 @@ export default function Register() {
               <label htmlFor="reg-confirm">Confirm Password</label>
               <input
                 id="reg-confirm"
+                className={invalid('confirm_password')}
                 type={showPassword ? 'text' : 'password'}
                 value={form.confirm_password}
                 onChange={update('confirm_password')}
                 autoComplete="new-password"
                 required
               />
+              <FieldError show={isMissing('confirm_password')} />
               {form.confirm_password && form.password !== form.confirm_password && (
                 <small className="pw-mismatch">Passwords do not match.</small>
               )}
             </div>
             <div>
-              <label>Full Name</label>
+              <label htmlFor="reg-fullname">Full Name</label>
               <input
+                id="reg-fullname"
+                className={invalid('full_name')}
                 value={form.full_name}
                 onChange={(e) => setForm({ ...form, full_name: capitalizeWords(e.target.value) })}
                 maxLength={150}
                 required
               />
+              <FieldError show={isMissing('full_name')} />
             </div>
             <div>
               <label htmlFor="reg-gender">Gender</label>
-              <select id="reg-gender" value={form.gender} onChange={update('gender')} required>
+              <select id="reg-gender" className={invalid('gender')} value={form.gender} onChange={update('gender')} required>
                 <option value="">Select gender</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
+                <option value="LGBTQ+">LGBTQ+</option>
               </select>
+              <FieldError show={isMissing('gender')} />
             </div>
             <div>
-              <label>Contact</label>
+              <label htmlFor="reg-contact">Contact</label>
               <input
+                id="reg-contact"
+                className={invalid('contact')}
+                required
                 value={form.contact}
                 onChange={(e) => setForm({ ...form, contact: e.target.value.replace(/\D/g, '').slice(0, 11) })}
                 inputMode="numeric"
                 maxLength={11}
-                placeholder="09123456789"
+                placeholder="*"
               />
+              <FieldError show={isMissing('contact')} />
             </div>
             <div>
-              <label>Email</label>
-              <input type="email" value={form.email} onChange={update('email')} maxLength={150} />
+              <label htmlFor="reg-email">Email</label>
+              <input
+                id="reg-email"
+                className={invalid('email')}
+                type="email"
+                required
+                value={form.email}
+                onChange={update('email')}
+                maxLength={150}
+              />
+              <FieldError show={isMissing('email')} />
             </div>
             <div>
               <label>Preferred Room</label>

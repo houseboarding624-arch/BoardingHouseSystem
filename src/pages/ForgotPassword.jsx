@@ -33,6 +33,7 @@ export default function ForgotPassword() {
   async function resetPassword(e) {
     e.preventDefault();
     setError('');
+    setInfo(''); // only one banner at a time
     if (!isStrongPassword(form.password)) return setError('Password does not meet all the requirements.');
     if (form.password !== form.confirm) return setError('Passwords do not match.');
     setBusy(true);

@@ -35,7 +35,7 @@ export default function PublicScanner() {
     lastRef.current = { token, at: now };
     try {
       const data = await api.post('/scan', { qr_token: token });
-      showResult({ ok: true, type: data.type, text: data.message, room: data.room });
+      showResult({ ok: true, type: data.type, text: data.message, room: data.room, time: data.time, name: data.name });
     } catch (err) {
       showResult({ ok: false, type: err.data?.type, text: err.message, room: err.data?.room });
     } finally {
@@ -116,11 +116,18 @@ export default function PublicScanner() {
         {result ? (
           <>
             <strong>
-              {result.type === 'TIME_IN' && '✅ TIME IN'}
-              {result.type === 'TIME_OUT' && '👋 TIME OUT'}
-              {!result.ok && '⚠️ ' + (result.type === 'DUPLICATE' || result.type === 'COMPLETE' ? 'ALREADY SCANNED' : 'CANNOT RECORD')}
+              {result.type === 'TIME_IN' && '✅ SUCCESSFULLY LOGGED IN'}
+              {result.type === 'TIME_OUT' && '👋 SUCCESSFULLY LOGGED OUT'}
+              {result.type === 'NOT_FOUND' && '❌ QR NOT FOUND'}
+              {!result.ok && result.type !== 'NOT_FOUND' && '⚠️ ' + (result.type === 'DUPLICATE' || result.type === 'COMPLETE' ? 'ALREADY SCANNED' : 'CANNOT RECORD')}
             </strong>
-            <span>{result.text}</span>
+            {result.ok && result.name && <span className="scan-name">{result.name}</span>}
+            {result.ok && result.time && (
+              <span className="scan-time">
+                {result.type === 'TIME_OUT' ? 'Time Out' : 'Time In'}: {result.time}
+              </span>
+            )}
+            {!(result.ok && result.time) && <span>{result.text}</span>}
             {result.room && <small>Room {result.room}</small>}
           </>
         ) : (

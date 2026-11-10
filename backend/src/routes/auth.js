@@ -54,7 +54,7 @@ const resetLimiter = rateLimit({
 
 const RESET_MINUTES = 15;
 const RESET_MAX_ATTEMPTS = 5;
-const GENDERS = ['Male', 'Female'];
+const GENDERS = ['Male', 'Female', 'LGBTQ+'];
 
 const missingPasswordRules = (password) =>
   PASSWORD_RULES.filter(([test]) => !test(password)).map(([, label]) => label);
@@ -156,9 +156,11 @@ router.post(
     const gender = String(body.gender ?? '').trim();
 
     if (!GENDERS.includes(gender)) {
-      return fail(res, 400, 'Please select your gender (Male or Female).');
+      return fail(res, 400, 'Please select your gender (Male, Female or LGBTQ+).');
     }
-    if (contact && !/^\d{1,11}$/.test(contact)) {
+    if (!contact) return fail(res, 400, 'Contact number is required.');
+    if (!email) return fail(res, 400, 'Email is required.');
+    if (!/^\d{1,11}$/.test(contact)) {
       return fail(res, 400, 'Contact number must be numbers only, up to 11 digits.');
     }
     // The boarding house only has Room 1 to Room MAX_ROOM.

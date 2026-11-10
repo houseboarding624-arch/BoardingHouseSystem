@@ -7,7 +7,7 @@ import GenderPie from '../components/GenderPie.jsx';
 import { useAuth } from '../auth.jsx';
 import SideLayout from '../components/SideLayout.jsx';
 import ReceiptModal from '../components/ReceiptModal.jsx';
-import { dateTime, peso, useBodyClass } from '../utils.js';
+import { dateTime, peso, timeOnly, useBodyClass } from '../utils.js';
 
 const VIEW_KEYS = ['overview', 'boarders', 'archives', 'attendance', 'payments', 'gcash', 'reports'];
 
@@ -148,7 +148,7 @@ export default function AdminDashboard() {
 
             <article className="admin-card">
               <div className="admin-section-heading">
-                <h2>👥 Boarders: Male / Female</h2>
+                <h2>👥 Boarders: Male / Female / LGBTQ+</h2>
               </div>
               <GenderPie boarders={boarders} />
             </article>
@@ -305,8 +305,8 @@ export default function AdminDashboard() {
                       <td>{r.full_name}</td>
                       <td>{r.room || '-'}</td>
                       <td>{r.attendance_date}</td>
-                      <td>{dateTime(r.time_in)}</td>
-                      <td>{dateTime(r.time_out)}</td>
+                      <td><b>{timeOnly(r.time_in)}</b></td>
+                      <td>{r.time_out ? <b>{timeOnly(r.time_out)}</b> : <span className="admin-muted">Not yet</span>}</td>
                       <td>
                         <span className="admin-badge">{r.status}</span>
                       </td>

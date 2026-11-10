@@ -13,6 +13,14 @@ export const peso = (value) =>
   })}`;
 
 /** "Oct 7, 2026, 3:05 PM" in Manila time, or "-" when empty. */
+/** Clock time only (e.g. 10:31:05 AM) in Philippine time, for attendance Time In / Time Out. */
+export function timeOnly(value) {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleTimeString('en-PH', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+}
+
 export function dateTime(value) {
   if (!value) return '-';
   const date = new Date(value);

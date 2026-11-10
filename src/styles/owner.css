@@ -776,3 +776,49 @@ button.owner-logout {
 /* Room + gender pie charts */
 .owner-row-pies { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
 @media (max-width: 900px) { .owner-row-pies { grid-template-columns: 1fr; } }
+
+/* Table action cells: a flex <td> breaks the row layout, so keep it a real table cell. */
+td.ov-actions { display: table-cell; white-space: normal; }
+td.ov-actions > .ov-btn { margin: 0 6px 6px 0; }
+
+/* Boarder Reports: one card per report */
+.rp-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.rp-tabs button {
+    border: 1px solid #cbd5e1; background: #fff; color: #334155; border-radius: 999px;
+    padding: 6px 14px; font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.rp-tabs button span {
+    display: inline-block; min-width: 20px; margin-left: 4px; padding: 0 6px; border-radius: 999px;
+    background: #e2e8f0; font-size: 12px; text-align: center;
+}
+.rp-tabs button.active { background: #0d9488; border-color: #0d9488; color: #fff; }
+.rp-tabs button.active span { background: rgba(255, 255, 255, 0.25); color: #fff; }
+
+.rp-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 14px; align-items: start; }
+.rp-card {
+    display: flex; flex-direction: column; gap: 10px; padding: 16px; background: #fff;
+    border: 1px solid #e2e8f0; border-left: 5px solid #94a3b8; border-radius: 10px; min-width: 0;
+}
+.rp-card.new { border-left-color: #e5484d; background: #fffafa; }
+.rp-card.progress { border-left-color: #f5a623; }
+.rp-card.done { border-left-color: #059669; }
+.rp-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.rp-who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.rp-avatar {
+    flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+    background: #ccfbf1; color: #0f766e; font-weight: 800;
+}
+.rp-subject { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.rp-subject h3 { margin: 0; font-size: 17px; line-height: 1.3; overflow-wrap: anywhere; }
+.rp-message {
+    margin: 0; padding: 10px 12px; background: #f1f5f9; border-radius: 8px; font-size: 15px;
+    line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.rp-reply { padding: 10px 12px; background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px; }
+.rp-reply span { font-size: 12px; font-weight: 800; color: #0f766e; letter-spacing: 0.04em; }
+.rp-reply p { margin: 4px 0 0; font-size: 15px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.rp-reply-form textarea {
+    width: 100%; box-sizing: border-box; padding: 9px 10px; border: 1px solid #cbd5e1; border-radius: 8px;
+    background: #fff; font: inherit; font-size: 15px; resize: vertical;
+}
+.rp-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }

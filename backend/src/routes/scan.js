@@ -21,7 +21,8 @@ router.post(
   scanLimiter,
   asyncHandler(async (req, res) => {
     const token = String(req.body?.qr_token ?? '').trim();
-    if (!token || token.length > 100) return fail(res, 400, 'No valid QR code was received.');
+    const notFound = () => fail(res, 404, 'QR not found.', { type: 'NOT_FOUND' });
+    if (!token || token.length > 100) return notFound();
 
     const users = unwrap(
       await supabase
@@ -31,9 +32,7 @@ router.post(
         .limit(1)
     );
     const person = users[0];
-    if (!person || person.role !== 'Boarder') {
-      return fail(res, 400, 'Invalid QR code. Please use your boarder QR.');
-    }
+    if (!person || person.role !== 'Boarder') return notFound();
     if (person.status === 'Pending' || person.status === 'Declined') {
       return fail(res, 403, 'Your account is not approved yet.');
     }
@@ -72,6 +71,7 @@ router.post(
       return res.json({
         success: true,
         type: 'TIME_IN',
+        time: clockTime(now),
         ...who,
         message: `${person.full_name} — Time In at ${clockTime(now)}`,
       });
@@ -94,6 +94,7 @@ router.post(
       return res.json({
         success: true,
         type: 'TIME_OUT',
+        time: clockTime(now),
         ...who,
         message: `${person.full_name} — Time Out at ${clockTime(now)}`,
       });

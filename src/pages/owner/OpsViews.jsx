@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api.js';
-import { dateTime, peso } from '../../utils.js';
+import { dateTime, peso, timeOnly } from '../../utils.js';
 import { useBlobUrl } from '../../useBlobUrl.js';
 import { Badge, Btn, Card, Field, Input, Select, Table } from './ui.jsx';
 
@@ -424,8 +424,8 @@ export function AttendanceView({ data }) {
             <td>{r.full_name}</td>
             <td>{r.room || '-'}</td>
             <td>{r.attendance_date}</td>
-            <td>{dateTime(r.time_in)}</td>
-            <td>{dateTime(r.time_out)}</td>
+            <td><b>{timeOnly(r.time_in)}</b></td>
+            <td>{r.time_out ? <b>{timeOnly(r.time_out)}</b> : <span className="property-sub">Not yet</span>}</td>
             <td>
               <Badge tone={r.status === 'IN' ? 'green' : 'gray'}>{r.status}</Badge>
             </td>
