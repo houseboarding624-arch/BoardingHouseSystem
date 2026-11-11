@@ -72,7 +72,6 @@ export default function QrGenerator() {
               <strong>{b.full_name}</strong>
               <span className="muted small">
                 Room {b.preferred_room || '-'}
-                {b.status === 'Disabled' ? ' · Disabled' : ''}
               </span>
               <div className="qr-box">
                 {b.qr_token && <QRCodeSVG value={b.qr_token} size={160} marginSize={2} />}

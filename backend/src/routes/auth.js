@@ -193,6 +193,14 @@ router.post(
     );
     if (sameUsername.length) return fail(res, 409, 'Username is already registered.');
 
+    // One person, one account: the same full name (ignoring capital letters and spaces) cannot register twice.
+    // Declined registrations do not count, so a rejected person can try again.
+    const nameKey = (value) => String(value ?? '').toLowerCase().replace(/\s+/g, '');
+    const usedNames = unwrap(await supabase.from('users').select('full_name').neq('status', 'Declined'));
+    if (usedNames.some((u) => nameKey(u.full_name) === nameKey(fullName))) {
+      return fail(res, 409, 'Full name has been used.', { field: 'full_name' });
+    }
+
     if (email) {
       const sameEmail = unwrap(
         await supabase.from('users').select('id').eq('email', email).limit(1)

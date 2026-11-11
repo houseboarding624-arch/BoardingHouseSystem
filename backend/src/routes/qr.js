@@ -18,7 +18,7 @@ router.get(
         .from('users')
         .select('id,full_name,preferred_room,status,qr_token')
         .eq('role', 'Boarder')
-        .in('status', ['Active', 'Disabled'])
+        .eq('status', 'Active') // disabled / archived boarders get no QR
         .order('full_name', { ascending: true })
     );
     res.json({ success: true, boarders });

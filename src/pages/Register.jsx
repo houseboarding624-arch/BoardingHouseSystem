@@ -51,6 +51,7 @@ export default function Register() {
   const [rooms, setRooms] = useState(null);
   const [roomsError, setRoomsError] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [takenName, setTakenName] = useState(''); // a full name the server said is already used
 
   useEffect(() => {
     let alive = true;
@@ -65,7 +66,8 @@ export default function Register() {
 
   // A field shows the message only while it is still empty after a submit attempt, so it clears as soon as it is filled.
   const isMissing = (field) => submitted && !String(form[field] ?? '').trim();
-  const invalid = (field) => (isMissing(field) ? 'invalid' : '');
+  const nameTaken = takenName !== '' && form.full_name.trim().toLowerCase().replace(/\s+/g, '') === takenName;
+  const invalid = (field) => (isMissing(field) || (field === 'full_name' && nameTaken) ? 'invalid' : '');
 
   const update = (field) => (event) => setForm({ ...form, [field]: event.target.value });
 
@@ -107,7 +109,14 @@ export default function Register() {
       const data = await api.post('/auth/register', payload);
       navigate(`/login?message=${encodeURIComponent(data.message)}`);
     } catch (err) {
-      setError(err.message);
+      if (err.message === 'Full name has been used.') {
+        setTakenName(form.full_name.trim().toLowerCase().replace(/\s+/g, ''));
+        const el = document.getElementById('reg-fullname');
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el?.focus({ preventScroll: true });
+      } else {
+        setError(err.message);
+      }
     } finally {
       setBusy(false);
     }
@@ -201,6 +210,7 @@ export default function Register() {
                 required
               />
               <FieldError show={isMissing('full_name')} />
+              {nameTaken && <small className="field-error">Full name has been used.</small>}
             </div>
             <div>
               <label htmlFor="reg-gender">Gender</label>
