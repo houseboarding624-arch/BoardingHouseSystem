@@ -46,15 +46,12 @@ export default function Home() {
       </header>
 
       <main>
-        {/* Wide photo, edge to edge. It sits above the text, so it never covers the buttons. */}
-        <div
-          className="lp-banner"
-          role="img"
-          aria-label="The boarding house building"
-          style={{ backgroundImage: `url(${heroPhoto})` }}
-        />
-
-        <section className="lp-hero">
+        {/* One wide, bright photo from edge to edge with the title and buttons inside it. */}
+        <section
+          className="lp-hero"
+          aria-label="Boarding House Record and Monitoring"
+          style={{ '--hero-img': `url(${heroPhoto})` }}
+        >
           <div className="lp-hero-text">
             <p className="lp-kicker">Smart boarding house system</p>
             <h1>

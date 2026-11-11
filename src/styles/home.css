@@ -96,34 +96,72 @@
 
 /* ---------- Hero ---------- */
 .lp-hero {
-  max-width: 1120px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   width: 100%;
-  margin: 0 auto;
-  padding: 44px 24px 36px;
+  min-height: clamp(440px, 64vh, 640px);
+  padding: clamp(24px, 5vw, 56px) 16px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  justify-items: center;
+  place-items: center;
   text-align: center;
+  background: #e9dcc6;
+}
+
+/* The photo: edge to edge, brightened, drifting slowly */
+.lp-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--hero-img) 50% 40% / cover no-repeat;
+  filter: brightness(1.22) saturate(1.08) contrast(1.02);
+  animation:
+    lp-hero-in 0.9s ease both,
+    lp-hero-pan 16s ease-in-out 1s infinite alternate;
+}
+
+/* Frosted card keeps the text easy to read while the photo stays bright */
+.lp-hero-text {
+  width: min(100%, 820px);
+  padding: clamp(24px, 4.5vw, 48px) clamp(18px, 4vw, 48px);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.84);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 18px 50px rgba(27, 42, 65, 0.22);
 }
 
 .lp-kicker {
-  margin: 0 0 12px;
-  color: var(--blue);
-  font-weight: 600;
+  display: inline-block;
+  margin: 0 0 14px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(36, 86, 214, 0.1);
+  color: var(--blue-dark);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .lp-hero h1 {
-  margin: 0 0 16px;
-  font-size: clamp(2rem, 4.2vw, 3.1rem);
-  line-height: 1.12;
+  margin: 0 0 14px;
+  font-size: clamp(1.75rem, 4.6vw, 3rem);
+  font-weight: 800;
+  line-height: 1.15;
   letter-spacing: -0.02em;
+  text-wrap: balance;
+  color: var(--ink);
 }
 
 .lp-lead {
-  margin: 0 auto 28px;
-  max-width: 46ch;
-  font-size: 1.125rem;
-  color: var(--muted);
+  margin: 0 auto 26px;
+  max-width: 44ch;
+  font-size: clamp(1rem, 1.7vw, 1.2rem);
+  line-height: 1.6;
+  color: #3d4a5f;
 }
 
 .lp-actions {
@@ -203,9 +241,7 @@
 /* ---------- Tablet ---------- */
 @media (max-width: 960px) {
   .lp-hero {
-    grid-template-columns: 1fr;
-    gap: 32px;
-    padding-top: 36px;
+    min-height: 0;
   }
 
 
@@ -444,23 +480,14 @@ html {
   50% { opacity: 0.35; }
 }
 
-/* ---------- Wide photo banner (edge to edge) ---------- */
-.lp-banner {
-  width: 100%;
-  height: clamp(200px, 26vw, 360px);
-  background: #d9cdb8 50% 40% / cover no-repeat;
-  animation:
-    lp-banner-in 0.9s ease both,
-    lp-banner-pan 16s ease-in-out 1s infinite alternate;
-}
-
-@keyframes lp-banner-in {
+/* ---------- Hero photo animation ---------- */
+@keyframes lp-hero-in {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
 /* slow, gentle drift up and down */
-@keyframes lp-banner-pan {
+@keyframes lp-hero-pan {
   from { background-position: 50% 25%; }
   to   { background-position: 50% 75%; }
 }
@@ -481,15 +508,15 @@ html {
 }
 
 @keyframes lp-title-slide {
-  from { transform: translateX(-14px); }
-  to   { transform: translateX(14px); }
+  from { transform: translateX(-8px); }
+  to   { transform: translateX(8px); }
 }
 
 @keyframes lp-title-blink {
   0%, 100% { opacity: 1; }
-  50%      { opacity: 0.3; }
+  50%      { opacity: 0.45; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lp-banner { animation: none; }
+  .lp-hero::before { animation: none; }
 }
