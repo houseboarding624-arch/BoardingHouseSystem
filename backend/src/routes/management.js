@@ -104,6 +104,14 @@ router.get(
         full_name: people.get(Number(g.user_id))?.full_name ?? 'Unknown',
       })),
       boarders: boarderRows,
+      roomList: rooms.map((r) => ({
+        room_number: r.room_number,
+        status: r.status,
+        monthly_rate: Number(r.monthly_rate ?? 0),
+        beds: r.beds,
+        beds_taken: r.beds_taken,
+        beds_left: r.beds_left,
+      })),
       archived,
       payments: payments.map((p) => ({
         ...p,

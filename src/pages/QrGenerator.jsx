@@ -2,13 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { api } from '../api.js';
-import { useAuth } from '../auth.jsx';
 import LogoutButton from '../components/LogoutButton.jsx';
 import Notice from '../components/Notice.jsx';
 
 export default function QrGenerator() {
-  const { user } = useAuth();
-  const back = user?.role === 'Admin' ? '/admin' : '/owner';
+  const back = '/admin'; // QR codes are managed by the admin only
 
   const [boarders, setBoarders] = useState([]);
   const [status, setStatus] = useState({ text: '', error: false });

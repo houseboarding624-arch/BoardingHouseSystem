@@ -127,7 +127,8 @@ export default function PublicScanner() {
                 {result.type === 'TIME_OUT' ? 'Time Out' : 'Time In'}: {result.time}
               </span>
             )}
-            {!(result.ok && result.time) && <span>{result.text}</span>}
+            {/* The heading already says "QR NOT FOUND", so don't repeat it as a second line. */}
+            {!(result.ok && result.time) && result.type !== 'NOT_FOUND' && <span>{result.text}</span>}
             {result.room && <small>Room {result.room}</small>}
           </>
         ) : (

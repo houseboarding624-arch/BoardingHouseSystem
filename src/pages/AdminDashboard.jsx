@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { api } from '../api.js';
 import { billingText } from './owner/ui.jsx';
 import RoomPie from '../components/RoomPie.jsx';
+import RoomList from '../components/RoomList.jsx';
 import GenderPie from '../components/GenderPie.jsx';
 import { useAuth } from '../auth.jsx';
 import SideLayout from '../components/SideLayout.jsx';
 import ReceiptModal from '../components/ReceiptModal.jsx';
 import { dateTime, peso, timeOnly, useBodyClass } from '../utils.js';
 
-const VIEW_KEYS = ['overview', 'boarders', 'archives', 'attendance', 'payments', 'gcash', 'reports'];
+const VIEW_KEYS = ['overview', 'boarders', 'rooms', 'archives', 'attendance', 'payments', 'gcash', 'reports'];
 
 function PageHead({ eyebrow, title, hint, action }) {
   return (
@@ -81,6 +82,7 @@ export default function AdminDashboard() {
       items: [
         { icon: '◧', label: 'Dashboard', view: 'overview' },
         { icon: '♟', label: 'Boarders', view: 'boarders' },
+        { icon: '🚪', label: 'Rooms', view: 'rooms' },
         { icon: '🗄', label: 'Archives', view: 'archives' },
         { icon: '◔', label: 'Attendance', view: 'attendance' },
       ],
@@ -96,7 +98,6 @@ export default function AdminDashboard() {
       label: 'Other',
       items: [
         { icon: '📢', label: 'Boarder Reports', view: 'reports', badge: stats?.newReports ?? 0 },
-        { icon: '▦', label: 'Boarder QR Codes', to: '/qr' },
       ],
     },
   ];
@@ -114,6 +115,18 @@ export default function AdminDashboard() {
             <article className="admin-stat">
               <span>Boarders</span>
               <strong>{stats?.boarders ?? 0}</strong>
+            </article>
+            <article className="admin-stat">
+              <span>Rooms Available</span>
+              <strong>{stats?.rooms?.available ?? 0}</strong>
+            </article>
+            <article className="admin-stat">
+              <span>Rooms Occupied</span>
+              <strong>{stats?.rooms?.occupied ?? 0}</strong>
+            </article>
+            <article className="admin-stat">
+              <span>Rooms Maintenance</span>
+              <strong>{stats?.rooms?.maintenance ?? 0}</strong>
             </article>
             <article className="admin-stat">
               <span>Payments Today</span>
@@ -212,6 +225,27 @@ export default function AdminDashboard() {
         </>
       )}
 
+      {current === 'rooms' && (
+        <>
+          <PageHead eyebrow="ROOMS" title="Rooms" hint="Which rooms are available, full (occupied) or under maintenance." />
+          <div className="admin-grid">
+            <article className="admin-card">
+              <div className="admin-section-heading">
+                <h2>🚪 Room summary</h2>
+                <span className="admin-badge">{stats?.rooms?.total ?? 0} rooms</span>
+              </div>
+              <RoomPie stats={stats?.rooms} />
+            </article>
+            <article className="admin-card">
+              <div className="admin-section-heading">
+                <h2>All rooms</h2>
+              </div>
+              <RoomList rooms={data?.roomList ?? []} />
+            </article>
+          </div>
+        </>
+      )}
+
       {current === 'archives' && (
         <>
           <PageHead
@@ -276,11 +310,6 @@ export default function AdminDashboard() {
             eyebrow="QR ATTENDANCE"
             title="Attendance"
             hint="Time-in / time-out records from the boarders' QR scans."
-            action={
-              <Link className="admin-btn" to="/qr">
-                📱 Boarder QR Codes
-              </Link>
-            }
           />
           <section className="admin-card admin-table-card">
             <div className="admin-section-heading">

@@ -130,8 +130,8 @@ export default function GcashCard({ gcash, history, roomRate, rentPaid, onDone }
               <input required maxLength={40} value={form.reference_no} onChange={set('reference_no')} placeholder="e.g. 1234567890123" />
             </label>
             <label>
-              Your GCash number (optional)
-              <input value={form.sender_number} onChange={set('sender_number')} placeholder="09171234567" />
+              Your GCash number
+              <input required inputMode="tel" maxLength={20} value={form.sender_number} onChange={set('sender_number')} placeholder="09171234567" />
             </label>
             <label className="bd-wide">
               Note (optional)

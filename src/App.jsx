@@ -49,7 +49,7 @@ export default function App() {
       <Route
         path="/qr"
         element={
-          <ProtectedRoute roles={['Admin', 'Owner']}>
+          <ProtectedRoute roles={['Admin']}>
             <QrGenerator />
           </ProtectedRoute>
         }

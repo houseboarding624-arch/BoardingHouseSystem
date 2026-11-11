@@ -62,6 +62,7 @@ const NAV = [
     group: 'Operations',
     items: [
       ['◔', 'Attendance', 'attendance'],
+      ['▦', 'Boarder QR Codes', '/qr'],
       ['📢', 'Boarder Reports', 'reports_inbox'],
       ['➤', 'Send Notification', 'notify'],
       ['ϟ', 'Utilities', 'utilities'],
@@ -106,7 +107,7 @@ const VIEWS = {
 
 function NavLink({ icon, label, view, current, badge }) {
   return (
-    <Link className={current === view ? 'active' : ''} to={`/admin#${view}`}>
+    <Link className={current === view ? 'active' : ''} to={view.startsWith('/') ? view : `/admin#${view}`}>
       <span className="nav-icon">{icon}</span>
       {label}
       {badge > 0 && <span className="nav-badge">{badge}</span>}

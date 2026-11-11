@@ -204,7 +204,8 @@ router.post(
     if (!/^[A-Z0-9]{8,20}$/.test(reference)) {
       return fail(res, 400, 'Enter the reference number from your GCash receipt (letters/numbers only).');
     }
-    if (sender && !/^(\+?63|0)9\d{9}$/.test(sender.replace(/[\s-]/g, ''))) {
+    if (!sender) return fail(res, 400, 'Your GCash number is required.');
+    if (!/^(\+?63|0)9\d{9}$/.test(sender.replace(/[\s-]/g, ''))) {
       return fail(res, 400, 'Your GCash number looks invalid (example: 09171234567).');
     }
 
@@ -224,7 +225,7 @@ router.post(
       amount,
       type,
       reference_no: reference,
-      sender_number: sender || null,
+      sender_number: sender,
       note: note || null,
     });
     if (error) {
