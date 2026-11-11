@@ -38,22 +38,19 @@ export default function BoarderDashboard() {
   const [printAll, setPrintAll] = useState(false);
   const [error, setError] = useState('');
 
+  const [justSeen, setJustSeen] = useState(0); // how many were new when the boarder opened Notifications
+
   const load = useCallback(
-    (markRead = false) =>
+    () =>
       api
         .get('/boarder/dashboard')
-        .then((result) => {
-          setData(result);
-          if (markRead && result.notifications?.some((n) => !n.is_read)) {
-            api.post('/boarder/notifications/read').catch(() => {});
-          }
-        })
+        .then((result) => setData(result))
         .catch((err) => setError(err.message)),
     []
   );
 
   useEffect(() => {
-    load(true);
+    load();
   }, [load]);
 
   const user = data?.user ?? session;
@@ -62,6 +59,20 @@ export default function BoarderDashboard() {
   const payments = data?.payments ?? [];
   const notifications = data?.notifications ?? [];
   const unread = notifications.filter((n) => !n.is_read).length;
+
+  // Opening the Notifications page means the boarder has seen them: mark them read so the red badge goes away.
+  useEffect(() => {
+    if (current !== 'notifications') {
+      setJustSeen(0);
+      return;
+    }
+    if (unread === 0) return;
+    setJustSeen(unread);
+    api
+      .post('/boarder/notifications/read')
+      .then(() => setData((d) => (d ? { ...d, notifications: d.notifications.map((n) => ({ ...n, is_read: true })) } : d)))
+      .catch(() => {});
+  }, [current, unread]);
 
   const groups = [
     {
@@ -272,7 +283,7 @@ export default function BoarderDashboard() {
             <section className="admin-card admin-table-card">
               <div className="admin-section-heading">
                 <h2>Notifications</h2>
-                <span className="admin-badge">{unread} new</span>
+                <span className="admin-badge">{unread || justSeen} new</span>
               </div>
               <div className="admin-table-wrap">
                 <table className="admin-table">

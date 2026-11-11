@@ -741,8 +741,8 @@ button.owner-logout {
 .ov-badge.orange { background: #fef3c7; color: #b45309; }
 .ov-badge.blue { background: #dbeafe; color: #1d4ed8; }
 
-.ov-room-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
-.ov-room-card { padding: 14px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f1f5f9; }
+.ov-room-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 14px; align-items: stretch; }
+.ov-room-card { display: flex; flex-direction: column; min-width: 0; padding: 14px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f1f5f9; }
 .ov-room-card.available { border-color: #34d399; }
 .ov-room-card.maintenance { border-color: #fbbf24; }
 .ov-room-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
@@ -822,3 +822,11 @@ td.ov-actions > .ov-btn { margin: 0 6px 6px 0; }
     background: #fff; font: inherit; font-size: 15px; resize: vertical;
 }
 .rp-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+
+/* Vacancy board: names list + assign box stay inside the card */
+.ov-room-people { margin-top: 10px; font-size: 14px; color: #475569; overflow-wrap: anywhere; }
+.ov-room-people ul { margin: 0; padding-left: 18px; }
+.ov-room-people li { margin: 2px 0; }
+.ov-assign { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 12px; }
+.ov-assign select { width: 100%; min-width: 0; box-sizing: border-box; text-overflow: ellipsis; }
+.ov-assign .ov-btn { width: 100%; box-sizing: border-box; text-align: center; }

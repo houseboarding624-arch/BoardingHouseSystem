@@ -77,7 +77,7 @@ export default function Home() {
         <section className="lp-scan" id="scan" aria-labelledby="lp-scan-title">
           <div className="lp-scan-card">
             <span className="eyebrow">QR ATTENDANCE</span>
-            <h2 id="lp-scan-title">Scan your QR — no login needed</h2>
+            <h2 id="lp-scan-title" className="lp-scan-blink">Scan your QR here</h2>
             <p>Show your boarder QR to the camera. First scan of the day is Time In, the next is Time Out.</p>
             <PublicScanner />
           </div>

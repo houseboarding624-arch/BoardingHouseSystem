@@ -116,7 +116,7 @@ function AssignBox({ room, boarders, run }) {
   const [userId, setUserId] = useState('');
   const candidates = boarders.filter((b) => b.status !== 'Disabled' && b.preferred_room !== room.room_number);
   return (
-    <div style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
+    <div className="ov-assign">
       <Select value={userId} onChange={(e) => setUserId(e.target.value)} style={{ marginTop: 0 }}>
         <option value="">Put a boarder here…</option>
         {candidates.map((b) => (
@@ -127,7 +127,6 @@ function AssignBox({ room, boarders, run }) {
         ))}
       </Select>
       <Btn
-        small
         disabled={!userId}
         onClick={async () => {
           if (await run(() => api.patch(`/owner/tenants/${userId}`, { preferred_room: room.room_number }))) setUserId('');
@@ -168,10 +167,18 @@ export function VacancyView({ data, run }) {
                     : `${r.beds_taken}/${r.beds} beds - ${r.beds_left} left`}
               </span>
             </div>
-            <div className="property-sub" style={{ marginTop: '8px' }}>
-              {r.tenantList.map((t) => t.full_name).join(', ') || 'No boarders yet'}
+            <div className="ov-room-people">
+              {r.tenantList.length ? (
+                <ul>
+                  {r.tenantList.map((t) => (
+                    <li key={t.id ?? t.full_name}>{t.full_name}</li>
+                  ))}
+                </ul>
+              ) : (
+                <span className="property-sub">No boarders yet</span>
+              )}
+              {reservedFor(r) > 0 && <div className="property-sub">{reservedFor(r)} reservation(s) for this room</div>}
             </div>
-            {reservedFor(r) > 0 && <div className="property-sub">{reservedFor(r)} reservation(s) for this room</div>}
             {r.status !== 'Maintenance' && (
               <AssignBox room={r} boarders={data.boarders} run={run} />
             )}
