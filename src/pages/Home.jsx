@@ -39,16 +39,27 @@ export default function Home() {
       <header className="lp-nav">
         <div className="lp-nav-inner">
           <Link className="lp-brand" to="/">
-            <span aria-hidden="true">🏠</span> Boarding House
+            <span className="lp-brand-icon" aria-hidden="true">🏠</span>
+            <span className="lp-brand-text">Boarding House</span>
           </Link>
         </div>
       </header>
 
       <main>
+        {/* Wide photo, edge to edge. It sits above the text, so it never covers the buttons. */}
+        <div
+          className="lp-banner"
+          role="img"
+          aria-label="The boarding house building"
+          style={{ backgroundImage: `url(${heroPhoto})` }}
+        />
+
         <section className="lp-hero">
           <div className="lp-hero-text">
             <p className="lp-kicker">Smart boarding house system</p>
-            <h1>Boarding House Record &amp; Monitoring</h1>
+            <h1>
+              <span className="lp-title-move">Boarding House Record &amp; Monitoring</span>
+            </h1>
             <p className="lp-lead">
               Manage boarders, rooms, payments, and QR attendance in one place.
             </p>
@@ -62,13 +73,6 @@ export default function Home() {
               </a>
             </div>
           </div>
-
-          <div
-            className="lp-hero-photo"
-            role="img"
-            aria-label="The boarding house building"
-            style={{ backgroundImage: `url(${heroPhoto})` }}
-          />
         </section>
 
         <section className="lp-scan" id="scan" aria-labelledby="lp-scan-title">
