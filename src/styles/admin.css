@@ -337,7 +337,7 @@
 
 @media print {
     /* Hide the whole app; only the receipt(s) are printed. */
-    body > *:not(.receipt-overlay) { display: none !important; }
+    body.printing-receipt > *:not(.receipt-overlay) { display: none !important; }
     body { background: #fff !important; }
     .receipt-overlay { position: static; display: block; background: #fff; padding: 0; overflow: visible; }
     .receipt-box { width: 100%; max-width: 420px; margin: 0 auto; }

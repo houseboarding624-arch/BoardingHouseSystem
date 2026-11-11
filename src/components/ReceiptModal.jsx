@@ -52,6 +52,12 @@ export default function ReceiptModal({ paymentId, all = false, onClose }) {
     };
   }, [paymentId, all]);
 
+  // While a receipt is open, printing hides the rest of the app (see admin.css). Other pages print normally.
+  useEffect(() => {
+    document.body.classList.add('printing-receipt');
+    return () => document.body.classList.remove('printing-receipt');
+  }, []);
+
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose();
     window.addEventListener('keydown', onKey);

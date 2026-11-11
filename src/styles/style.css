@@ -722,6 +722,17 @@ html {
     .no-print {
         display: none !important;
     }
+    /* Boarder QR cards: three per row, never split across pages */
+    .qr-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 0;
+    }
+    .qr-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 1px solid #999;
+    }
     body {
         background: #fff !important;
     }
