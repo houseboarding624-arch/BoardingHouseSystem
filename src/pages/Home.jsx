@@ -57,9 +57,6 @@ export default function Home() {
               <Link className="lp-btn lp-btn-primary" to="/login">
                 Log in to system
               </Link>
-              <a className="lp-btn lp-btn-ghost" href="#scan">
-                📷 Scan QR code
-              </a>
               <a className="lp-btn lp-btn-ghost" href="#rules">
                 📋 House rules
               </a>
