@@ -452,6 +452,10 @@ html {
   animation-delay: 0.4s;
 }
 
+.lp-actions .lp-btn:nth-child(3) {
+  animation-delay: 0.8s;
+}
+
 .lp-actions .lp-btn:hover {
   animation-play-state: paused;
   opacity: 1;

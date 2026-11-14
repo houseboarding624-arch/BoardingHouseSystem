@@ -6,9 +6,10 @@ import heroPhoto from '../assets/boarding-house.jpg';
 
 // Location shown on the home page map. Change these to move the pin.
 const MAP_LINK = 'https://maps.app.goo.gl/nXBEcdRhbRHADWUA9';
-const MAP_LAT = 16.7225573;
-const MAP_LNG = 121.5372101;
-const MAP_EMBED = `https://maps.google.com/maps?q=${MAP_LAT},${MAP_LNG}&z=17&output=embed`;
+const MAP_LAT = 16.724324594052604;
+const MAP_LNG = 121.53433476758192;
+const MAP_LABEL = 'Napro Dormitory';
+const MAP_EMBED = `https://maps.google.com/maps?q=${MAP_LAT},${MAP_LNG}(${encodeURIComponent(MAP_LABEL)})&z=17&hl=en&output=embed`;
 
 const FEATURES = [
   ['👥', 'Boarders', 'Manage boarder accounts and profiles.'],
@@ -48,6 +49,9 @@ export default function Home() {
             <span className="lp-brand-icon" aria-hidden="true">🏠</span>
             <span className="lp-brand-text">Boarding House</span>
           </Link>
+          <a className="lp-btn lp-btn-small" href="#location">
+            📍 Map
+          </a>
         </div>
       </header>
 
@@ -68,6 +72,9 @@ export default function Home() {
               </Link>
               <a className="lp-btn lp-btn-ghost" href="#rules">
                 📋 House rules
+              </a>
+              <a className="lp-btn lp-btn-ghost" href="#location">
+                📍 Location
               </a>
             </div>
           </div>
