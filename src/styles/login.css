@@ -413,14 +413,14 @@
 }
 
 .auth-glow {
-    --glow-colors: #2563eb, #06b6d4, #10b981, #facc15, #f97316, #ec4899, #8b5cf6, #2563eb;
+    --glow-colors: #2563eb, #06b6d4, #10b981, #06b6d4, #2563eb;
     position: relative;
     isolation: isolate;
     width: min(480px, 100%);
-    padding: 4px;
-    border-radius: 22px;
+    padding: 3px;
+    border-radius: 21px;
     background: conic-gradient(from var(--glow-angle), var(--glow-colors));
-    animation: authGlowSpin 4s linear infinite;
+    animation: authGlowSpin 12s linear infinite;
 }
 
 .auth-glow.wide {
@@ -431,13 +431,13 @@
 .auth-glow::before {
     content: '';
     position: absolute;
-    inset: -6px;
+    inset: -2px;
     z-index: -1;
-    border-radius: 28px;
+    border-radius: 23px;
     background: conic-gradient(from var(--glow-angle), var(--glow-colors));
-    filter: blur(18px);
-    opacity: 0.8;
-    animation: authGlowSpin 4s linear infinite, authGlowPulse 2.4s ease-in-out infinite;
+    filter: blur(8px);
+    opacity: 0.3;
+    animation: authGlowSpin 12s linear infinite;
 }
 
 .auth-glow > .auth-card {

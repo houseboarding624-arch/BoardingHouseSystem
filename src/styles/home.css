@@ -584,28 +584,26 @@ html {
 }
 
 .glow-ring {
-  --ring-colors: #2563eb, #06b6d4, #10b981, #facc15, #f97316, #ec4899, #8b5cf6, #2563eb;
+  --ring-colors: #2563eb, #06b6d4, #10b981, #06b6d4, #2563eb;
   position: relative;
   isolation: isolate;
-  padding: 4px;
-  border-radius: 24px;
+  padding: 3px;
+  border-radius: 23px;
   background: conic-gradient(from var(--ring-angle), var(--ring-colors));
-  animation: glow-ring-spin 4s linear infinite;
+  animation: glow-ring-spin 12s linear infinite;
 }
 
 /* Blurred halo that follows the same spinning colors */
 .glow-ring::before {
   content: '';
   position: absolute;
-  inset: -6px;
+  inset: -2px;
   z-index: -1;
-  border-radius: 30px;
+  border-radius: 25px;
   background: conic-gradient(from var(--ring-angle), var(--ring-colors));
-  filter: blur(18px);
-  opacity: 0.8;
-  animation:
-    glow-ring-spin 4s linear infinite,
-    glow-ring-pulse 2.4s ease-in-out infinite;
+  filter: blur(8px);
+  opacity: 0.3;
+  animation: glow-ring-spin 12s linear infinite;
 }
 
 .scan-glow {
@@ -613,7 +611,7 @@ html {
 }
 
 .scan-glow::before {
-  border-radius: 26px;
+  border-radius: 22px;
 }
 
 /* The hero wrapper also runs its entrance + float animations */
@@ -621,7 +619,7 @@ html {
   animation:
     lp-photo-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both,
     lp-photo-float 5s ease-in-out 1.2s infinite,
-    glow-ring-spin 4s linear infinite;
+    glow-ring-spin 12s linear infinite;
 }
 
 @keyframes glow-ring-spin {
