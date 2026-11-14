@@ -112,10 +112,6 @@ export default function Login() {
           </form>
 
           <p className="auth-footer">
-            <Link to="/forgot-password">Forgot password?</Link>
-          </p>
-
-          <p className="auth-footer">
             Boarder without an account? <Link to="/register">Create an account</Link>
           </p>
         </section>

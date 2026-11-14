@@ -247,7 +247,7 @@ export default function BoarderDashboard() {
                   </thead>
                   <tbody>
                     {attendance.map((a) => (
-                      <tr key={a.attendance_date}>
+                      <tr key={a.id}>
                         <td>{a.attendance_date}</td>
                         <td><b>{timeOnly(a.time_in)}</b></td>
                         <td>{a.time_out ? <b>{timeOnly(a.time_out)}</b> : <span className="admin-muted">Not yet</span>}</td>

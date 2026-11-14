@@ -1,0 +1,157 @@
+/* =====================================================================
+   Soft, comfortable design for the Boarder, Owner and Admin dashboards.
+   Same look as the Login / Create Account card: gentle blue-white gradients,
+   a thin colored strip on top, soft corners and shadows. Easy on the eyes.
+
+   Only the containers are styled (backgrounds, borders, corners, shadows).
+   Fonts, font sizes and text colors are NOT touched here.
+   ===================================================================== */
+
+/* ---- Page background: soft blue-gray instead of glaring pure white ---- */
+body.owner-body {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.07), transparent 40%),
+        radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.07), transparent 40%),
+        linear-gradient(160deg, #eef3f9 0%, #e8eff8 100%);
+    background-attachment: fixed;
+}
+
+/* ---- Sidebar and top bar ---- */
+body.owner-body .owner-sidebar {
+    background: linear-gradient(180deg, #f4f8fd 0%, #eaf1f9 100%);
+    border-right: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 4px 0 18px rgba(15, 23, 42, 0.04);
+}
+
+body.owner-body .owner-topbar {
+    background: rgba(255, 255, 255, 0.55);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+body.owner-body .owner-nav a:hover,
+body.owner-body .owner-nav a.active {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.14), rgba(6, 182, 212, 0.12));
+}
+
+/* ---- Main cards: login-card look (strip on top + soft corner tints) ---- */
+body.owner-body .owner-card,
+body.owner-body .admin-card,
+body.owner-body .owner-stat:not(.teal),
+body.owner-body .admin-stat:not(.danger),
+body.owner-body .logout-modal {
+    background:
+        linear-gradient(90deg, #60a5fa, #22d3ee, #34d399) top left / 100% 4px no-repeat,
+        radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.08), transparent 45%),
+        radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.08), transparent 45%),
+        linear-gradient(160deg, #fbfdff 0%, #eff5fc 100%);
+    border: 1px solid rgba(203, 213, 225, 0.75);
+    border-radius: 16px;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+}
+
+/* ---- Smaller boxes inside the cards: same gradient, no strip.
+   Colored borders that mean something (room status, report status) are left alone. ---- */
+body.owner-body .account-item,
+body.owner-body .payment-item,
+body.owner-body .quick-action,
+body.owner-body .ov-room-card,
+body.owner-body .ov-snapshot div,
+body.owner-body .pw-rules {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.07), transparent 50%),
+        linear-gradient(160deg, #fbfdff 0%, #f0f6fc 100%);
+    border-radius: 12px;
+}
+
+body.owner-body .account-item,
+body.owner-body .payment-item,
+body.owner-body .quick-action,
+body.owner-body .ov-snapshot div,
+body.owner-body .pw-rules {
+    border-color: rgba(203, 213, 225, 0.8);
+}
+
+body.owner-body .quick-action:hover {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.12), transparent 50%),
+        linear-gradient(160deg, #ffffff 0%, #e8f1fb 100%);
+}
+
+/* Report cards keep their colored left edge; a new report keeps a soft red tint */
+body.owner-body .rp-card {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.07), transparent 50%),
+        linear-gradient(160deg, #fbfdff 0%, #f0f6fc 100%);
+    border-radius: 12px;
+}
+
+body.owner-body .rp-card.new {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(229, 72, 77, 0.08), transparent 50%),
+        linear-gradient(160deg, #fffafa 0%, #fdf0f0 100%);
+}
+
+/* ---- Tables ---- */
+body.owner-body .admin-table-wrap,
+body.owner-body .property-table {
+    border-radius: 12px;
+}
+
+body.owner-body .admin-table th,
+body.owner-body .property-table th {
+    background: linear-gradient(180deg, #edf3fa, #e5edf7);
+}
+
+body.owner-body .admin-table td,
+body.owner-body .property-table td {
+    border-color: rgba(203, 213, 225, 0.6);
+}
+
+body.owner-body .admin-table tbody tr:not(.due-urgent):hover td,
+body.owner-body .property-table tbody tr:not(.due-urgent):hover td {
+    background: rgba(37, 99, 235, 0.05);
+}
+
+/* ---- Fields: soft background and the same blue focus glow as Login ---- */
+body.owner-body .admin-form input,
+body.owner-body .admin-form select,
+body.owner-body .bd-form input,
+body.owner-body .bd-form select,
+body.owner-body .bd-form textarea,
+body.owner-body .ov-assign select,
+body.owner-body .rp-reply-form textarea {
+    background: #f7fafd;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+body.owner-body .admin-form input:hover,
+body.owner-body .admin-form select:hover,
+body.owner-body .bd-form input:hover,
+body.owner-body .bd-form select:hover,
+body.owner-body .bd-form textarea:hover {
+    border-color: #93c5fd;
+}
+
+body.owner-body .admin-form input:focus,
+body.owner-body .admin-form select:focus,
+body.owner-body .bd-form input:focus,
+body.owner-body .bd-form select:focus,
+body.owner-body .bd-form textarea:focus,
+body.owner-body .ov-assign select:focus,
+body.owner-body .rp-reply-form textarea:focus {
+    background: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    outline: none;
+}
+
+/* ---- Modal backdrop a little softer ---- */
+body.owner-body .logout-overlay {
+    background: rgba(15, 23, 42, 0.45);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+}

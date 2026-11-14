@@ -152,6 +152,9 @@ router.get(
     }));
     const activeBoarders = boarderRows.filter((b) => b.status !== 'Disabled');
     const todayRecords = attendance.filter((r) => r.attendance_date === today);
+    // A boarder can scan many times a day: count people, using each person's newest record (the list is newest first).
+    const latestToday = new Map();
+    for (const r of todayRecords) if (!latestToday.has(r.user_id)) latestToday.set(r.user_id, r);
 
     const months = monthKeys(today, 6);
     const report = months.map((month) => ({
@@ -193,8 +196,8 @@ router.get(
         newReports: reports.filter((r) => r.status === 'New').length,
         pendingGcash: gcashPayments.filter((g) => g.status === 'Pending').length,
         pendingRegistrations: registrations.filter((r) => r.status === 'Pending').length,
-        todayAttendance: todayRecords.length,
-        todayTimeOut: todayRecords.filter((r) => r.time_out).length,
+        todayAttendance: latestToday.size,
+        todayTimeOut: [...latestToday.values()].filter((r) => r.time_out).length,
       },
       accounts: {
         owners: allUsers.filter((u) => u.role === 'Owner').length,

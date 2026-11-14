@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { supabase, unwrap } from '../supabase.js';
 import { asyncHandler, fail } from '../utils/http.js';
 import { rateLimit } from '../middleware/rateLimit.js';
-import { todayString, clockTime } from '../utils/time.js';
+import { todayString, clockTime, minutesOfDay } from '../utils/time.js';
 
 const router = Router();
 
@@ -13,9 +13,10 @@ const scanLimiter = rateLimit({
 });
 
 const DOUBLE_SCAN_MS = 60 * 1000; // ignore a repeat scan within 1 minute
+const SCAN_CLOSES_AT = 22 * 60; // 10:00 PM (Manila): no more Time In / Time Out after this
 
 // Public (no login): the scanner on the home page posts the boarder's personal QR here.
-// First scan of the day = Time In, second = Time Out.
+// Scans alternate: Time In, Time Out, Time In, Time Out ... as many times as needed, until 10:00 PM.
 router.post(
   '/',
   scanLimiter,
@@ -47,38 +48,27 @@ router.post(
     const now = new Date();
     const who = { name: person.full_name, room: person.preferred_room ?? null };
 
+    if (minutesOfDay(now) >= SCAN_CLOSES_AT) {
+      return fail(res, 403, `${person.full_name}, scanning is closed after 10:00 PM. See you tomorrow!`, {
+        type: 'CLOSED',
+        ...who,
+      });
+    }
+
+    // The newest record of today decides what this scan is: still inside -> Time Out, otherwise -> Time In.
     const records = unwrap(
       await supabase
         .from('attendance')
         .select('id,time_in,time_out')
         .eq('user_id', person.id)
         .eq('attendance_date', today)
+        .order('id', { ascending: false })
         .limit(1)
     );
-    const record = records[0];
+    const last = records[0];
 
-    if (!record) {
-      unwrap(
-        await supabase.from('attendance').insert({
-          user_id: person.id,
-          attendance_date: today,
-          time_in: now.toISOString(),
-          time_out: null,
-          qr_token: token,
-          status: 'IN',
-        })
-      );
-      return res.json({
-        success: true,
-        type: 'TIME_IN',
-        time: clockTime(now),
-        ...who,
-        message: `${person.full_name} — Time In at ${clockTime(now)}`,
-      });
-    }
-
-    if (record.time_in && !record.time_out) {
-      const since = now.getTime() - new Date(record.time_in).getTime();
+    if (last && last.time_in && !last.time_out) {
+      const since = now.getTime() - new Date(last.time_in).getTime();
       if (since < DOUBLE_SCAN_MS) {
         return fail(res, 409, `${person.full_name}, you already scanned a moment ago.`, {
           type: 'DUPLICATE',
@@ -89,7 +79,7 @@ router.post(
         await supabase
           .from('attendance')
           .update({ time_out: now.toISOString(), status: 'OUT' })
-          .eq('id', record.id)
+          .eq('id', last.id)
       );
       return res.json({
         success: true,
@@ -100,9 +90,29 @@ router.post(
       });
     }
 
-    return fail(res, 409, `${person.full_name} already has Time In and Time Out today.`, {
-      type: 'COMPLETE',
+    if (last?.time_out && now.getTime() - new Date(last.time_out).getTime() < DOUBLE_SCAN_MS) {
+      return fail(res, 409, `${person.full_name}, you already scanned a moment ago.`, {
+        type: 'DUPLICATE',
+        ...who,
+      });
+    }
+
+    unwrap(
+      await supabase.from('attendance').insert({
+        user_id: person.id,
+        attendance_date: today,
+        time_in: now.toISOString(),
+        time_out: null,
+        qr_token: token,
+        status: 'IN',
+      })
+    );
+    return res.json({
+      success: true,
+      type: 'TIME_IN',
+      time: clockTime(now),
       ...who,
+      message: `${person.full_name} — Time In at ${clockTime(now)}`,
     });
   })
 );

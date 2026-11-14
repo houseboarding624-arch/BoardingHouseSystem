@@ -3,7 +3,6 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
-import ForgotPassword from './pages/ForgotPassword.jsx';
 import BoarderDashboard from './pages/BoarderDashboard.jsx';
 import QrGenerator from './pages/QrGenerator.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
@@ -15,7 +14,6 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       <Route
         path="/boarder"

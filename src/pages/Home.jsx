@@ -46,12 +46,7 @@ export default function Home() {
       </header>
 
       <main>
-        {/* One wide, bright photo from edge to edge with the title and buttons inside it. */}
-        <section
-          className="lp-hero"
-          aria-label="Boarding House Record and Monitoring"
-          style={{ '--hero-img': `url(${heroPhoto})` }}
-        >
+        <section className="lp-hero">
           <div className="lp-hero-text">
             <p className="lp-kicker">Smart boarding house system</p>
             <h1>
@@ -70,13 +65,20 @@ export default function Home() {
               </a>
             </div>
           </div>
+
+          <div
+            className="lp-hero-photo"
+            role="img"
+            aria-label="The boarding house building"
+            style={{ backgroundImage: `url(${heroPhoto})` }}
+          />
         </section>
 
         <section className="lp-scan" id="scan" aria-labelledby="lp-scan-title">
           <div className="lp-scan-card">
             <span className="eyebrow">QR ATTENDANCE</span>
             <h2 id="lp-scan-title" className="lp-scan-blink">Scan your QR here</h2>
-            <p>Show your boarder QR to the camera. First scan of the day is Time In, the next is Time Out.</p>
+            <p>Show your boarder QR to the camera. Each scan switches between Time In and Time Out, as many times as you need until 10:00 PM.</p>
             <PublicScanner />
           </div>
         </section>

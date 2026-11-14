@@ -132,7 +132,7 @@ Known limit: the login cookie is sent between two different sites, so browsers t
 - Every boarder has a personal QR (`users.qr_token`, created by migration `20261016000000_boarder_qr.sql`).
 - Admin/Owner print the cards at `/qr`. Boarders can also see their QR on their dashboard.
 - The home page opens the camera automatically. A scan calls `POST /api/scan`, which writes
-  Time In (first scan of the day) / Time Out (second scan) to the Supabase `attendance` table.
+  Time In / Time Out to the Supabase `attendance` table. Scans alternate (Time In, Time Out, Time In, ...) as many times as needed during the day, but scanning closes at 10:00 PM (Manila). Run the migration `20261113000000_attendance_many_scans.sql` first.
 - Admin (Attendance tab) and Owner dashboards refresh every 10 seconds, so scans show up live.
 
 ## Room availability, reports, GCash (boarder dashboard)
@@ -152,10 +152,8 @@ Known limit: the login cookie is sent between two different sites, so browsers t
 
 Run the migration `supabase/migrations/20261018000000_advance_gender_reset.sql` first.
 
-- **Forgot password** (`/forgot-password`): the boarder enters username or email, gets a 6-digit code by email
-  (valid 15 minutes, 5 tries, stored hashed), then sets a new password. Needs the Gmail/SMTP settings; in
-  development the code is printed in the backend console. No email on the account? Admin > Tenants > *Reset
-  password* creates a temporary password, and the boarder changes it in *Change Password* on their dashboard.
+- **Forgot password was removed.** A boarder who forgot the password asks the admin: Admin > Tenants > *Reset password* creates a temporary password, and the boarder changes it in *Change Password* on their dashboard.
+- **One contact number and one email per account:** Create Account refuses a contact number or email that is already registered (Declined registrations don't count).
 - **4 beds per room:** every room has 4 beds. Rooms, the Vacancy Board and the boarder dashboard show how many beds are taken and how many are left; a full room cannot take more boarders. Run the migration `20261111000000_four_beds_per_room.sql`.
 - **Room dropdown on Create Account:** the Preferred Room field lists Room 1-12 with how many boarders are in each (for example "Room 3 - Available (2 of 4 boarders, 2 beds left)"); full and under-maintenance rooms cannot be picked. Run the migration `20261112000000_rooms_1_to_12.sql` to create any missing rooms.
 - **Create Account rules:** username is 8-12 characters, starts with a capital letter, letters and numbers only (the login is case-sensitive, so log in with the same capital letter); full name and address start every word with a capital letter; contact is up to 11 digits.

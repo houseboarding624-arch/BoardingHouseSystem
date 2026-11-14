@@ -119,7 +119,7 @@ export default function PublicScanner() {
               {result.type === 'TIME_IN' && '✅ SUCCESSFULLY LOGGED IN'}
               {result.type === 'TIME_OUT' && '👋 SUCCESSFULLY LOGGED OUT'}
               {result.type === 'NOT_FOUND' && '❌ QR NOT FOUND'}
-              {!result.ok && result.type !== 'NOT_FOUND' && '⚠️ ' + (result.type === 'DUPLICATE' || result.type === 'COMPLETE' ? 'ALREADY SCANNED' : 'CANNOT RECORD')}
+              {!result.ok && result.type !== 'NOT_FOUND' && '⚠️ ' + (result.type === 'DUPLICATE' || result.type === 'COMPLETE' ? 'ALREADY SCANNED' : result.type === 'CLOSED' ? 'SCANNING CLOSED' : 'CANNOT RECORD')}
             </strong>
             {result.ok && result.name && <span className="scan-name">{result.name}</span>}
             {result.ok && result.time && (

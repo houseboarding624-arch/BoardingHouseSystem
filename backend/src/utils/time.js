@@ -32,3 +32,9 @@ export function nowHHMM(date = new Date()) {
   const get = (type) => parts.find((p) => p.type === type)?.value ?? '00';
   return `${get('hour')}:${get('minute')}`;
 }
+
+/** Minutes since midnight in the app timezone (for example 22:00 -> 1320). */
+export function minutesOfDay(date = new Date()) {
+  const [hours, minutes] = nowHHMM(date).split(':').map(Number);
+  return hours * 60 + minutes;
+}

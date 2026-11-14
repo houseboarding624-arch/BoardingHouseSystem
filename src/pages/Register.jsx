@@ -24,6 +24,7 @@ const REQUIRED = [
   ['gender', 'reg-gender'],
   ['contact', 'reg-contact'],
   ['email', 'reg-email'],
+  ['address', 'reg-address'],
 ];
 
 function FieldError({ show }) {
@@ -52,6 +53,8 @@ export default function Register() {
   const [roomsError, setRoomsError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [takenName, setTakenName] = useState(''); // a full name the server said is already used
+  const [takenContact, setTakenContact] = useState(''); // a contact number the server said is already used
+  const [takenEmail, setTakenEmail] = useState(''); // an email the server said is already used
 
   useEffect(() => {
     let alive = true;
@@ -67,7 +70,15 @@ export default function Register() {
   // A field shows the message only while it is still empty after a submit attempt, so it clears as soon as it is filled.
   const isMissing = (field) => submitted && !String(form[field] ?? '').trim();
   const nameTaken = takenName !== '' && form.full_name.trim().toLowerCase().replace(/\s+/g, '') === takenName;
-  const invalid = (field) => (isMissing(field) || (field === 'full_name' && nameTaken) ? 'invalid' : '');
+  const contactTaken = takenContact !== '' && form.contact.trim() === takenContact;
+  const emailTaken = takenEmail !== '' && form.email.trim().toLowerCase() === takenEmail;
+  const invalid = (field) =>
+    isMissing(field) ||
+    (field === 'full_name' && nameTaken) ||
+    (field === 'contact' && contactTaken) ||
+    (field === 'email' && emailTaken)
+      ? 'invalid'
+      : '';
 
   const update = (field) => (event) => setForm({ ...form, [field]: event.target.value });
 
@@ -112,6 +123,13 @@ export default function Register() {
       if (err.message === 'Full name has been used.') {
         setTakenName(form.full_name.trim().toLowerCase().replace(/\s+/g, ''));
         const el = document.getElementById('reg-fullname');
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el?.focus({ preventScroll: true });
+      } else if (err.data?.field === 'contact' || err.data?.field === 'email') {
+        const isContact = err.data.field === 'contact';
+        if (isContact) setTakenContact(form.contact.trim());
+        else setTakenEmail(form.email.trim().toLowerCase());
+        const el = document.getElementById(isContact ? 'reg-contact' : 'reg-email');
         el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         el?.focus({ preventScroll: true });
       } else {
@@ -235,6 +253,7 @@ export default function Register() {
                 placeholder="*"
               />
               <FieldError show={isMissing('contact')} />
+              {contactTaken && <small className="field-error">Contact number is already registered.</small>}
             </div>
             <div>
               <label htmlFor="reg-email">Email</label>
@@ -248,6 +267,7 @@ export default function Register() {
                 maxLength={150}
               />
               <FieldError show={isMissing('email')} />
+              {emailTaken && <small className="field-error">Email is already registered.</small>}
             </div>
             <div>
               <label>Preferred Room</label>
@@ -262,12 +282,16 @@ export default function Register() {
               {roomsError && <small style={{ color: '#b91c1c', fontWeight: 700 }}>{roomsError}</small>}
             </div>
             <div>
-              <label>Address</label>
+              <label htmlFor="reg-address">Address</label>
               <input
+                id="reg-address"
+                className={invalid('address')}
+                required
                 value={form.address}
                 onChange={(e) => setForm({ ...form, address: capitalizeWords(e.target.value) })}
                 maxLength={255}
               />
+              <FieldError show={isMissing('address')} />
             </div>
             <div className="full">
               <button className="btn btn-primary" type="submit" disabled={busy}>

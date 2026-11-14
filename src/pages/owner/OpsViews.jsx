@@ -413,7 +413,7 @@ export function AttendanceView({ data }) {
       }
     >
       <p className="ov-hint" style={{ marginTop: 0 }}>
-        {data.stats.todayAttendance} scanned in today · {data.stats.todayTimeOut} timed out. Updates automatically.
+        {data.stats.todayAttendance} boarder(s) scanned today · {data.stats.todayTimeOut} timed out now. Boarders can scan in and out many times until 10:00 PM. Updates automatically.
       </p>
       <Table
         head={['Boarder', 'Room', 'Date', 'Time In', 'Time Out', 'Status']}

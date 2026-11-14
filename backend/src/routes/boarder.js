@@ -41,9 +41,10 @@ router.get(
     const attendance = unwrap(
       await supabase
         .from('attendance')
-        .select('attendance_date,time_in,time_out,status')
+        .select('id,attendance_date,time_in,time_out,status')
         .eq('user_id', id)
         .order('attendance_date', { ascending: false })
+        .order('id', { ascending: false })
         .limit(30)
     );
 
