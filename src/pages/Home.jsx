@@ -57,7 +57,7 @@ export default function Home() {
           <div className="lp-hero-text">
             <p className="lp-kicker">Smart boarding house system</p>
             <h1>
-              <span className="lp-title-move">Boarding House Record &amp; Monitoring</span>
+              <span className="lp-title-move">Boarding House Management &amp; Monitoring System</span>
             </h1>
             <p className="lp-lead">
               Manage boarders, rooms, payments, and QR attendance in one place.
