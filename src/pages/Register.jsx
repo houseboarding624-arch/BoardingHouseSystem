@@ -149,6 +149,7 @@ export default function Register() {
       </div>
 
       <main className="auth-page">
+        <div className="auth-glow wide">
         <section className="auth-card wide">
           <div className="auth-icon">👤</div>
           <h1>Create Boarder Account</h1>
@@ -304,6 +305,7 @@ export default function Register() {
             Already registered? <Link to="/login">Login here</Link>
           </p>
         </section>
+        </div>
       </main>
     </div>
   );

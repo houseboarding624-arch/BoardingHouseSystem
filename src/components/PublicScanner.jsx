@@ -95,6 +95,7 @@ export default function PublicScanner() {
 
   return (
     <div className="scan-panel">
+      <div className="scan-glow glow-ring">
       <div className="scan-frame">
         <div id={READER_ID} className="scan-reader" />
         {camera !== 'on' && (
@@ -110,6 +111,7 @@ export default function PublicScanner() {
             )}
           </div>
         )}
+      </div>
       </div>
 
       <div className={`scan-status ${tone}`} role="status" aria-live="polite">

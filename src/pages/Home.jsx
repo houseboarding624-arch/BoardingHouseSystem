@@ -4,6 +4,12 @@ import { RULES } from '../rulesData.js';
 import PublicScanner from '../components/PublicScanner.jsx';
 import heroPhoto from '../assets/boarding-house.jpg';
 
+// Location shown on the home page map. Change these to move the pin.
+const MAP_LINK = 'https://maps.app.goo.gl/nXBEcdRhbRHADWUA9';
+const MAP_LAT = 16.7225573;
+const MAP_LNG = 121.5372101;
+const MAP_EMBED = `https://maps.google.com/maps?q=${MAP_LAT},${MAP_LNG}&z=17&output=embed`;
+
 const FEATURES = [
   ['👥', 'Boarders', 'Manage boarder accounts and profiles.'],
   ['🚪', 'Rooms', 'Monitor room availability and rates.'],
@@ -66,12 +72,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div
-            className="lp-hero-photo"
-            role="img"
-            aria-label="The boarding house building"
-            style={{ backgroundImage: `url(${heroPhoto})` }}
-          />
+          <div className="lp-hero-photo-wrap glow-ring">
+            <div
+              className="lp-hero-photo"
+              role="img"
+              aria-label="The boarding house building"
+              style={{ backgroundImage: `url(${heroPhoto})` }}
+            />
+          </div>
         </section>
 
         <section className="lp-scan" id="scan" aria-labelledby="lp-scan-title">
@@ -102,6 +110,31 @@ export default function Home() {
               </li>
             ))}
           </ul>
+        </section>
+        <section className="lp-map" id="location" aria-labelledby="lp-map-title">
+          <div className="lp-map-inner">
+            <div className="lp-map-head lp-reveal">
+              <span className="eyebrow">LOCATION</span>
+              <h2 id="lp-map-title">Find us on the map</h2>
+              <a
+                className="lp-btn lp-btn-primary"
+                href={MAP_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                📍 Open in Google Maps
+              </a>
+            </div>
+            <div className="lp-map-frame lp-reveal">
+              <iframe
+                title="Boarding house location map"
+                src={MAP_EMBED}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </div>
         </section>
       </main>
 

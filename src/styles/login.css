@@ -404,3 +404,59 @@
 .auth-card .form input.invalid,
 .auth-card .form select.invalid { border-color: #dc2626; background: #fef2f2; }
 .field-error { display: block; margin-top: 4px; color: #b91c1c; font-size: 13px; font-weight: 700; }
+
+/* ---- Endless colorful glowing border around the login / create-account card ---- */
+@property --glow-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.auth-glow {
+    --glow-colors: #2563eb, #06b6d4, #10b981, #facc15, #f97316, #ec4899, #8b5cf6, #2563eb;
+    position: relative;
+    isolation: isolate;
+    width: min(480px, 100%);
+    padding: 4px;
+    border-radius: 22px;
+    background: conic-gradient(from var(--glow-angle), var(--glow-colors));
+    animation: authGlowSpin 4s linear infinite;
+}
+
+.auth-glow.wide {
+    width: min(760px, 100%);
+}
+
+/* Soft blurred halo that follows the same spinning colors */
+.auth-glow::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    z-index: -1;
+    border-radius: 28px;
+    background: conic-gradient(from var(--glow-angle), var(--glow-colors));
+    filter: blur(18px);
+    opacity: 0.8;
+    animation: authGlowSpin 4s linear infinite, authGlowPulse 2.4s ease-in-out infinite;
+}
+
+.auth-glow > .auth-card {
+    width: 100%;
+    border-radius: 18px;
+}
+
+@keyframes authGlowSpin {
+    to { --glow-angle: 360deg; }
+}
+
+@keyframes authGlowPulse {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 0.95; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-glow,
+    .auth-glow::before {
+        animation: none;
+    }
+}

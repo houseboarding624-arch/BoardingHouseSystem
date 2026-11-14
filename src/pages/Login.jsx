@@ -55,6 +55,7 @@ export default function Login() {
       </div>
 
       <main className="auth-page">
+        <div className="auth-glow">
         <section className="auth-card">
           <div className="auth-icon">🏠</div>
           <h1>Boarding House</h1>
@@ -115,6 +116,7 @@ export default function Login() {
             Boarder without an account? <Link to="/register">Create an account</Link>
           </p>
         </section>
+        </div>
       </main>
     </div>
   );
