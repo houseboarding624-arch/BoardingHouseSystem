@@ -49,9 +49,6 @@ export default function Home() {
             <span className="lp-brand-icon" aria-hidden="true">🏠</span>
             <span className="lp-brand-text">Boarding House</span>
           </Link>
-          <a className="lp-btn lp-btn-small" href="#location">
-            📍 Map
-          </a>
         </div>
       </header>
 
