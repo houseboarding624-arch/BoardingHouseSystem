@@ -44,10 +44,8 @@ export default function Home() {
   return (
     <div className="lp">
       <header className="lp-nav">
-        <div className="lp-nav-inner">
+        <div className="lp-nav-inner"> 
           <Link className="lp-brand" to="/">
-            <span className="lp-brand-icon" aria-hidden="true">🏠</span>
-            <span className="lp-brand-text">Boarding House</span>
           </Link>
         </div>
       </header>
@@ -175,7 +173,7 @@ export default function Home() {
       </section>
 
       <footer className="lp-footer">
-        <p>Boarding House Record &amp; Monitoring System</p>
+        <p>Boarding House Management &amp; Monitoring System</p>
       </footer>
     </div>
   );
