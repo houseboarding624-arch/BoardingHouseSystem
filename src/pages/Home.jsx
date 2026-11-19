@@ -66,9 +66,6 @@ export default function Home() {
               <Link className="lp-btn lp-btn-primary" to="/login">
                 Log in to system
               </Link>
-              <a className="lp-btn lp-btn-ghost" href="#availability">
-                🚪 Available rooms
-              </a>
               <a className="lp-btn lp-btn-ghost" href="#rules">
                 📋 House rules
               </a>
@@ -117,19 +114,6 @@ export default function Home() {
             ))}
           </ul>
         </section>
-        <section className="lp-avail" id="availability" aria-labelledby="lp-avail-title">
-          <div className="lp-avail-inner">
-            <div className="lp-avail-head lp-reveal">
-              <span className="eyebrow">AVAILABLE ROOMS</span>
-              <h2 id="lp-avail-title">Room availability map</h2>
-              <p>
-                See which rooms still have free beds. Every room has 4 beds. No login needed, and no boarder
-                names are shown.
-              </p>
-            </div>
-            <RoomMap />
-          </div>
-        </section>
         <section className="lp-map" id="location" aria-labelledby="lp-map-title">
           <div className="lp-map-inner">
             <div className="lp-map-head lp-reveal">
@@ -153,6 +137,19 @@ export default function Home() {
                 referrerPolicy="no-referrer-when-downgrade"
               />
             </div>
+          </div>
+        </section>
+        <section className="lp-avail" id="availability" aria-labelledby="lp-avail-title">
+          <div className="lp-avail-inner">
+            <div className="lp-avail-head lp-reveal">
+              <span className="eyebrow">AVAILABLE ROOMS</span>
+              <h2 id="lp-avail-title">Room availability map</h2>
+              <p>
+                See which rooms still have free beds. Every room has 4 beds. No login needed, and no boarder
+                names are shown.
+              </p>
+            </div>
+            <RoomMap />
           </div>
         </section>
       </main>
