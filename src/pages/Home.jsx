@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { RULES } from '../rulesData.js';
 import PublicScanner from '../components/PublicScanner.jsx';
+import RoomMap from '../components/RoomMap.jsx';
 import heroPhoto from '../assets/boarding-house.jpg';
 
 // Location shown on the home page map. Change these to move the pin.
@@ -65,6 +66,9 @@ export default function Home() {
               <Link className="lp-btn lp-btn-primary" to="/login">
                 Log in to system
               </Link>
+              <a className="lp-btn lp-btn-ghost" href="#availability">
+                🚪 Available rooms
+              </a>
               <a className="lp-btn lp-btn-ghost" href="#rules">
                 📋 House rules
               </a>
@@ -112,6 +116,19 @@ export default function Home() {
               </li>
             ))}
           </ul>
+        </section>
+        <section className="lp-avail" id="availability" aria-labelledby="lp-avail-title">
+          <div className="lp-avail-inner">
+            <div className="lp-avail-head lp-reveal">
+              <span className="eyebrow">AVAILABLE ROOMS</span>
+              <h2 id="lp-avail-title">Room availability map</h2>
+              <p>
+                See which rooms still have free beds. Every room has 4 beds. No login needed, and no boarder
+                names are shown.
+              </p>
+            </div>
+            <RoomMap />
+          </div>
         </section>
         <section className="lp-map" id="location" aria-labelledby="lp-map-title">
           <div className="lp-map-inner">
